@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "미니맵",
+  "MEL_MINIMAP.Toggle": "미니맵 표시",
+  "MEL_MINIMAP.AutoOpen": "월드 시작 시 미니맵 열기",
+  "MEL_MINIMAP.ShowBackground": "지도 배경 표시",
+  "MEL_MINIMAP.NoScene": "활성 장면이 없습니다",
+  "MEL_MINIMAP.NoCanvas": "캔버스가 아직 준비되지 않았습니다",
+  "MEL_MINIMAP.Legend.Party": "파티",
+  "MEL_MINIMAP.Legend.Neutral": "중립",
+  "MEL_MINIMAP.Legend.Opposition": "적대 세력",
+  "MEL_MINIMAP.Legend.Self": "나"
+}

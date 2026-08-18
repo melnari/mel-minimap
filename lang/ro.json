@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "Minimapă",
+  "MEL_MINIMAP.Toggle": "Afișează minimapa",
+  "MEL_MINIMAP.AutoOpen": "Deschide minimapa la pornirea lumii",
+  "MEL_MINIMAP.ShowBackground": "Afișează fundalul hărții",
+  "MEL_MINIMAP.NoScene": "Nu există nicio scenă activă",
+  "MEL_MINIMAP.NoCanvas": "Canvasul nu este încă pregătit",
+  "MEL_MINIMAP.Legend.Party": "Grup",
+  "MEL_MINIMAP.Legend.Neutral": "Neutru",
+  "MEL_MINIMAP.Legend.Opposition": "Opoziție",
+  "MEL_MINIMAP.Legend.Self": "Eu"
+}

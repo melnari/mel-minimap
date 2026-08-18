@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "Minimap",
+  "MEL_MINIMAP.Toggle": "Minimap tonen",
+  "MEL_MINIMAP.AutoOpen": "Minimap openen wanneer de wereld start",
+  "MEL_MINIMAP.ShowBackground": "Kaartachtergrond tonen",
+  "MEL_MINIMAP.NoScene": "Geen actieve scène",
+  "MEL_MINIMAP.NoCanvas": "Canvas is nog niet gereed",
+  "MEL_MINIMAP.Legend.Party": "Groep",
+  "MEL_MINIMAP.Legend.Neutral": "Neutraal",
+  "MEL_MINIMAP.Legend.Opposition": "Tegenstanders",
+  "MEL_MINIMAP.Legend.Self": "Ik"
+}

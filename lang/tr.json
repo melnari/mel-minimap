@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "Mini harita",
+  "MEL_MINIMAP.Toggle": "Mini haritayı göster",
+  "MEL_MINIMAP.AutoOpen": "Dünya başladığında mini haritayı aç",
+  "MEL_MINIMAP.ShowBackground": "Harita arka planını göster",
+  "MEL_MINIMAP.NoScene": "Etkin sahne yok",
+  "MEL_MINIMAP.NoCanvas": "Tuval henüz hazır değil",
+  "MEL_MINIMAP.Legend.Party": "Grup",
+  "MEL_MINIMAP.Legend.Neutral": "Tarafsız",
+  "MEL_MINIMAP.Legend.Opposition": "Muhalif",
+  "MEL_MINIMAP.Legend.Self": "Ben"
+}

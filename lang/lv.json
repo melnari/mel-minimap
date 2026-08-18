@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "Minikarte",
+  "MEL_MINIMAP.Toggle": "Rādīt minikarti",
+  "MEL_MINIMAP.AutoOpen": "Atvērt minikarti, sākoties pasaulei",
+  "MEL_MINIMAP.ShowBackground": "Rādīt kartes fonu",
+  "MEL_MINIMAP.NoScene": "Nav aktīvas ainas",
+  "MEL_MINIMAP.NoCanvas": "Kanva vēl nav gatava",
+  "MEL_MINIMAP.Legend.Party": "Grupa",
+  "MEL_MINIMAP.Legend.Neutral": "Neitrālie",
+  "MEL_MINIMAP.Legend.Opposition": "Pretinieki",
+  "MEL_MINIMAP.Legend.Self": "Es"
+}

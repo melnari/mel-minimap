@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "Minikartta",
+  "MEL_MINIMAP.Toggle": "Näytä minikartta",
+  "MEL_MINIMAP.AutoOpen": "Avaa minikartta maailman käynnistyessä",
+  "MEL_MINIMAP.ShowBackground": "Näytä kartan tausta",
+  "MEL_MINIMAP.NoScene": "Aktiivista kohtausta ei ole",
+  "MEL_MINIMAP.NoCanvas": "Piirtoalusta ei ole vielä valmis",
+  "MEL_MINIMAP.Legend.Party": "Ryhmä",
+  "MEL_MINIMAP.Legend.Neutral": "Neutraalit",
+  "MEL_MINIMAP.Legend.Opposition": "Vastustajat",
+  "MEL_MINIMAP.Legend.Self": "Minä"
+}

@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "ミニマップ",
+  "MEL_MINIMAP.Toggle": "ミニマップを表示",
+  "MEL_MINIMAP.AutoOpen": "ワールド開始時にミニマップを開く",
+  "MEL_MINIMAP.ShowBackground": "マップの背景を表示",
+  "MEL_MINIMAP.NoScene": "アクティブなシーンがありません",
+  "MEL_MINIMAP.NoCanvas": "キャンバスはまだ準備できていません",
+  "MEL_MINIMAP.Legend.Party": "パーティ",
+  "MEL_MINIMAP.Legend.Neutral": "中立",
+  "MEL_MINIMAP.Legend.Opposition": "対立",
+  "MEL_MINIMAP.Legend.Self": "自分"
+}

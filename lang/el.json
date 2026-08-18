@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "Μίνι χάρτης",
+  "MEL_MINIMAP.Toggle": "Εμφάνιση μίνι χάρτη",
+  "MEL_MINIMAP.AutoOpen": "Άνοιγμα μίνι χάρτη κατά την εκκίνηση του κόσμου",
+  "MEL_MINIMAP.ShowBackground": "Εμφάνιση φόντου χάρτη",
+  "MEL_MINIMAP.NoScene": "Δεν υπάρχει ενεργή σκηνή",
+  "MEL_MINIMAP.NoCanvas": "Ο καμβάς δεν είναι ακόμη έτοιμος",
+  "MEL_MINIMAP.Legend.Party": "Ομάδα",
+  "MEL_MINIMAP.Legend.Neutral": "Ουδέτεροι",
+  "MEL_MINIMAP.Legend.Opposition": "Αντίπαλοι",
+  "MEL_MINIMAP.Legend.Self": "Εγώ"
+}

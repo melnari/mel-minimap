@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "Minimapė",
+  "MEL_MINIMAP.Toggle": "Rodyti minimapę",
+  "MEL_MINIMAP.AutoOpen": "Atidaryti minimapę paleidus pasaulį",
+  "MEL_MINIMAP.ShowBackground": "Rodyti žemėlapio foną",
+  "MEL_MINIMAP.NoScene": "Nėra aktyvios scenos",
+  "MEL_MINIMAP.NoCanvas": "Drobė dar neparengta",
+  "MEL_MINIMAP.Legend.Party": "Grupė",
+  "MEL_MINIMAP.Legend.Neutral": "Neutralūs",
+  "MEL_MINIMAP.Legend.Opposition": "Priešininkai",
+  "MEL_MINIMAP.Legend.Self": "Aš"
+}

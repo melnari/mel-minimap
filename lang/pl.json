@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "Minimapa",
+  "MEL_MINIMAP.Toggle": "Pokaż minimapę",
+  "MEL_MINIMAP.AutoOpen": "Otwórz minimapę przy uruchomieniu świata",
+  "MEL_MINIMAP.ShowBackground": "Pokaż tło mapy",
+  "MEL_MINIMAP.NoScene": "Brak aktywnej sceny",
+  "MEL_MINIMAP.NoCanvas": "Płótno nie jest jeszcze gotowe",
+  "MEL_MINIMAP.Legend.Party": "Drużyna",
+  "MEL_MINIMAP.Legend.Neutral": "Neutralni",
+  "MEL_MINIMAP.Legend.Opposition": "Przeciwnicy",
+  "MEL_MINIMAP.Legend.Self": "Ja"
+}

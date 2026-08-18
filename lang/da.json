@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "Minikort",
+  "MEL_MINIMAP.Toggle": "Vis minikort",
+  "MEL_MINIMAP.AutoOpen": "Åbn minikort ved start af verden",
+  "MEL_MINIMAP.ShowBackground": "Vis kortbaggrund",
+  "MEL_MINIMAP.NoScene": "Ingen aktiv scene",
+  "MEL_MINIMAP.NoCanvas": "Lærredet er ikke klar endnu",
+  "MEL_MINIMAP.Legend.Party": "Gruppen",
+  "MEL_MINIMAP.Legend.Neutral": "Neutrale",
+  "MEL_MINIMAP.Legend.Opposition": "Modstandere",
+  "MEL_MINIMAP.Legend.Self": "Mig"
+}

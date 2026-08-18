@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "小地图",
+  "MEL_MINIMAP.Toggle": "显示小地图",
+  "MEL_MINIMAP.AutoOpen": "世界启动时打开小地图",
+  "MEL_MINIMAP.ShowBackground": "显示地图背景",
+  "MEL_MINIMAP.NoScene": "没有活动场景",
+  "MEL_MINIMAP.NoCanvas": "画布尚未准备好",
+  "MEL_MINIMAP.Legend.Party": "队伍",
+  "MEL_MINIMAP.Legend.Neutral": "中立",
+  "MEL_MINIMAP.Legend.Opposition": "敌对",
+  "MEL_MINIMAP.Legend.Self": "我"
+}

@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "Minimapa",
+  "MEL_MINIMAP.Toggle": "Zobraziť minimapu",
+  "MEL_MINIMAP.AutoOpen": "Otvoriť minimapu pri spustení sveta",
+  "MEL_MINIMAP.ShowBackground": "Zobraziť pozadie mapy",
+  "MEL_MINIMAP.NoScene": "Nie je aktívna scéna",
+  "MEL_MINIMAP.NoCanvas": "Plátno ešte nie je pripravené",
+  "MEL_MINIMAP.Legend.Party": "Družina",
+  "MEL_MINIMAP.Legend.Neutral": "Neutrálni",
+  "MEL_MINIMAP.Legend.Opposition": "Protivníci",
+  "MEL_MINIMAP.Legend.Self": "Ja"
+}

@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "Minikarte",
+  "MEL_MINIMAP.Toggle": "Minikarte anzeigen",
+  "MEL_MINIMAP.AutoOpen": "Minikarte beim Weltstart öffnen",
+  "MEL_MINIMAP.ShowBackground": "Kartenhintergrund anzeigen",
+  "MEL_MINIMAP.NoScene": "Keine aktive Scene",
+  "MEL_MINIMAP.NoCanvas": "Canvas ist noch nicht bereit",
+  "MEL_MINIMAP.Legend.Party": "Verbündet",
+  "MEL_MINIMAP.Legend.Neutral": "Neutral",
+  "MEL_MINIMAP.Legend.Opposition": "Gegner",
+  "MEL_MINIMAP.Legend.Self": "Ich"
+}

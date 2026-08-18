@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "Minimapa",
+  "MEL_MINIMAP.Toggle": "Erakutsi minimapa",
+  "MEL_MINIMAP.AutoOpen": "Ireki minimapa mundua abiaraztean",
+  "MEL_MINIMAP.ShowBackground": "Erakutsi maparen atzeko planoa",
+  "MEL_MINIMAP.NoScene": "Ez dago eszena aktiborik",
+  "MEL_MINIMAP.NoCanvas": "Oihala ez dago prest oraindik",
+  "MEL_MINIMAP.Legend.Party": "Taldea",
+  "MEL_MINIMAP.Legend.Neutral": "Neutralak",
+  "MEL_MINIMAP.Legend.Opposition": "Aurkariak",
+  "MEL_MINIMAP.Legend.Self": "Ni"
+}

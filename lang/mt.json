@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "Minimap",
+  "MEL_MINIMAP.Toggle": "Uri l-minimap",
+  "MEL_MINIMAP.AutoOpen": "Iftaħ il-minimap meta tibda d-dinja",
+  "MEL_MINIMAP.ShowBackground": "Uri l-isfond tal-mappa",
+  "MEL_MINIMAP.NoScene": "M’hemm l-ebda xena attiva",
+  "MEL_MINIMAP.NoCanvas": "Il-kanvas għadu mhux lest",
+  "MEL_MINIMAP.Legend.Party": "Grupp",
+  "MEL_MINIMAP.Legend.Neutral": "Newtrali",
+  "MEL_MINIMAP.Legend.Opposition": "Oppożizzjoni",
+  "MEL_MINIMAP.Legend.Self": "Jien"
+}

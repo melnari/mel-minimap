@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "Minizemljevid",
+  "MEL_MINIMAP.Toggle": "Prikaži minizemljevid",
+  "MEL_MINIMAP.AutoOpen": "Odpri minizemljevid ob zagonu sveta",
+  "MEL_MINIMAP.ShowBackground": "Prikaži ozadje zemljevida",
+  "MEL_MINIMAP.NoScene": "Aktivna scena ne obstaja",
+  "MEL_MINIMAP.NoCanvas": "Platno še ni pripravljeno",
+  "MEL_MINIMAP.Legend.Party": "Skupina",
+  "MEL_MINIMAP.Legend.Neutral": "Nevtralni",
+  "MEL_MINIMAP.Legend.Opposition": "Nasprotniki",
+  "MEL_MINIMAP.Legend.Self": "Jaz"
+}

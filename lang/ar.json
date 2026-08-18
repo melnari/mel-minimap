@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "خريطة مصغرة",
+  "MEL_MINIMAP.Toggle": "إظهار الخريطة المصغرة",
+  "MEL_MINIMAP.AutoOpen": "فتح الخريطة المصغرة عند بدء العالم",
+  "MEL_MINIMAP.ShowBackground": "إظهار خلفية الخريطة",
+  "MEL_MINIMAP.NoScene": "لا يوجد مشهد نشط",
+  "MEL_MINIMAP.NoCanvas": "اللوحة ليست جاهزة بعد",
+  "MEL_MINIMAP.Legend.Party": "المجموعة",
+  "MEL_MINIMAP.Legend.Neutral": "محايد",
+  "MEL_MINIMAP.Legend.Opposition": "خصوم",
+  "MEL_MINIMAP.Legend.Self": "أنا"
+}

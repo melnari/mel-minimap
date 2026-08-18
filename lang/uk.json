@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "Мінімапа",
+  "MEL_MINIMAP.Toggle": "Показати мінімапу",
+  "MEL_MINIMAP.AutoOpen": "Відкривати мінімапу під час запуску світу",
+  "MEL_MINIMAP.ShowBackground": "Показувати тло мапи",
+  "MEL_MINIMAP.NoScene": "Немає активної сцени",
+  "MEL_MINIMAP.NoCanvas": "Полотно ще не готове",
+  "MEL_MINIMAP.Legend.Party": "Група",
+  "MEL_MINIMAP.Legend.Neutral": "Нейтральні",
+  "MEL_MINIMAP.Legend.Opposition": "Супротивники",
+  "MEL_MINIMAP.Legend.Self": "Я"
+}

@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "Minitérkép",
+  "MEL_MINIMAP.Toggle": "Minitérkép megjelenítése",
+  "MEL_MINIMAP.AutoOpen": "Minitérkép megnyitása a világ indításakor",
+  "MEL_MINIMAP.ShowBackground": "Térképháttér megjelenítése",
+  "MEL_MINIMAP.NoScene": "Nincs aktív jelenet",
+  "MEL_MINIMAP.NoCanvas": "A vászon még nem áll készen",
+  "MEL_MINIMAP.Legend.Party": "Csapat",
+  "MEL_MINIMAP.Legend.Neutral": "Semlegesek",
+  "MEL_MINIMAP.Legend.Opposition": "Ellenfelek",
+  "MEL_MINIMAP.Legend.Self": "Én"
+}

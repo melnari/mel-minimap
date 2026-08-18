@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "Minimapa",
+  "MEL_MINIMAP.Toggle": "Ipakita ang minimapa",
+  "MEL_MINIMAP.AutoOpen": "Ablihi ang minimapa sa pagsugod sa kalibutan",
+  "MEL_MINIMAP.ShowBackground": "Ipakita ang background sa mapa",
+  "MEL_MINIMAP.NoScene": "Walay aktibong eksena",
+  "MEL_MINIMAP.NoCanvas": "Dili pa andam ang canvas",
+  "MEL_MINIMAP.Legend.Party": "Grupo",
+  "MEL_MINIMAP.Legend.Neutral": "Neutral",
+  "MEL_MINIMAP.Legend.Opposition": "Mga kaatbang",
+  "MEL_MINIMAP.Legend.Self": "Ako"
+}

@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "Minikarta",
+  "MEL_MINIMAP.Toggle": "Prikaži minikartu",
+  "MEL_MINIMAP.AutoOpen": "Otvori minikartu pri pokretanju svijeta",
+  "MEL_MINIMAP.ShowBackground": "Prikaži pozadinu karte",
+  "MEL_MINIMAP.NoScene": "Nema aktivne scene",
+  "MEL_MINIMAP.NoCanvas": "Platno još nije spremno",
+  "MEL_MINIMAP.Legend.Party": "Družina",
+  "MEL_MINIMAP.Legend.Neutral": "Neutralni",
+  "MEL_MINIMAP.Legend.Opposition": "Protivnici",
+  "MEL_MINIMAP.Legend.Self": "Ja"
+}

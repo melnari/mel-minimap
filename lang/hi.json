@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "मिनीमैप",
+  "MEL_MINIMAP.Toggle": "मिनीमैप दिखाएँ",
+  "MEL_MINIMAP.AutoOpen": "दुनिया शुरू होने पर मिनीमैप खोलें",
+  "MEL_MINIMAP.ShowBackground": "मानचित्र की पृष्ठभूमि दिखाएँ",
+  "MEL_MINIMAP.NoScene": "कोई सक्रिय दृश्य नहीं",
+  "MEL_MINIMAP.NoCanvas": "कैनवास अभी तैयार नहीं है",
+  "MEL_MINIMAP.Legend.Party": "दल",
+  "MEL_MINIMAP.Legend.Neutral": "तटस्थ",
+  "MEL_MINIMAP.Legend.Opposition": "विरोधी",
+  "MEL_MINIMAP.Legend.Self": "मैं"
+}

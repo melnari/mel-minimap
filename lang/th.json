@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "แผนที่ย่อ",
+  "MEL_MINIMAP.Toggle": "แสดงแผนที่ย่อ",
+  "MEL_MINIMAP.AutoOpen": "เปิดแผนที่ย่อเมื่อเริ่มโลก",
+  "MEL_MINIMAP.ShowBackground": "แสดงพื้นหลังแผนที่",
+  "MEL_MINIMAP.NoScene": "ไม่มีฉากที่ใช้งานอยู่",
+  "MEL_MINIMAP.NoCanvas": "แคนวาสยังไม่พร้อม",
+  "MEL_MINIMAP.Legend.Party": "กลุ่มผู้เล่น",
+  "MEL_MINIMAP.Legend.Neutral": "เป็นกลาง",
+  "MEL_MINIMAP.Legend.Opposition": "ฝ่ายตรงข้าม",
+  "MEL_MINIMAP.Legend.Self": "ฉัน"
+}

@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "Миникарта",
+  "MEL_MINIMAP.Toggle": "Показване на миникартата",
+  "MEL_MINIMAP.AutoOpen": "Отваряне на миникартата при стартиране на света",
+  "MEL_MINIMAP.ShowBackground": "Показване на фона на картата",
+  "MEL_MINIMAP.NoScene": "Няма активна сцена",
+  "MEL_MINIMAP.NoCanvas": "Платното още не е готово",
+  "MEL_MINIMAP.Legend.Party": "Група",
+  "MEL_MINIMAP.Legend.Neutral": "Неутрални",
+  "MEL_MINIMAP.Legend.Opposition": "Противници",
+  "MEL_MINIMAP.Legend.Self": "Аз"
+}

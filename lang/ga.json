@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "Mionléarscáil",
+  "MEL_MINIMAP.Toggle": "Mionléarscáil a thaispeáint",
+  "MEL_MINIMAP.AutoOpen": "Mionléarscáil a oscailt nuair a thosaíonn an domhan",
+  "MEL_MINIMAP.ShowBackground": "Cúlra na léarscáile a thaispeáint",
+  "MEL_MINIMAP.NoScene": "Níl aon radharc gníomhach ann",
+  "MEL_MINIMAP.NoCanvas": "Níl an chanbhás réidh fós",
+  "MEL_MINIMAP.Legend.Party": "Cóisir",
+  "MEL_MINIMAP.Legend.Neutral": "Neodrach",
+  "MEL_MINIMAP.Legend.Opposition": "Freasúra",
+  "MEL_MINIMAP.Legend.Self": "Mé"
+}

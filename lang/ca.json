@@ -1,0 +1,12 @@
+{
+  "MEL_MINIMAP.Title": "Minimapa",
+  "MEL_MINIMAP.Toggle": "Mostrar el minimapa",
+  "MEL_MINIMAP.AutoOpen": "Obrir el minimapa en iniciar el món",
+  "MEL_MINIMAP.ShowBackground": "Mostrar el fons del mapa",
+  "MEL_MINIMAP.NoScene": "No hi ha cap escena activa",
+  "MEL_MINIMAP.NoCanvas": "El llenç encara no està preparat",
+  "MEL_MINIMAP.Legend.Party": "Grup",
+  "MEL_MINIMAP.Legend.Neutral": "Neutre",
+  "MEL_MINIMAP.Legend.Opposition": "Oposició",
+  "MEL_MINIMAP.Legend.Self": "Jo"
+}
