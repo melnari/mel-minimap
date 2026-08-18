@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Mel-Minimap
 
 Mel-Minimap is an add-on module for Foundry Virtual Tabletop 14.x. It displays the active Scene as a compact, movable overview map with token markers and a frame showing the current canvas viewport.
