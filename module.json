@@ -7,7 +7,7 @@
   "download": "https://github.com/melnari/mel-minimap/releases/download/v1.0.1/mel-minimap.zip",
   "version": "1.0.1",
   "type": "module",
-  "authors": [
+  "authors": [0]
     {
       "name": "Melnari",
       "email": "laris@email.de",
