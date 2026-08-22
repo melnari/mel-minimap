@@ -2,7 +2,7 @@
 
 Mel-Minimap is an add-on module for Foundry Virtual Tabletop 14.x. It displays the active Scene as a compact, movable overview map with token markers and a frame showing the current canvas viewport.
 
-The module manifest targets Foundry VTT 14 and is verified with Foundry VTT 14.366.
+The module manifest targets Foundry VTT 14 and is verified with Foundry VTT 14.367.
 
 ## Features
 
@@ -21,6 +21,7 @@ The module manifest targets Foundry VTT 14 and is verified with Foundry VTT 14.3
   - Opposition: hostile tokens
   - Self: the controlled token or the token belonging to the user's character
 - Highlights the user's own token with a white marker and blue outline.
+- Shows a hovered token's name and localized disposition at the top-left of the minimap, subject to Foundry's token name-display setting and player permissions.
 - Shows the currently visible main-canvas area as a translucent white frame.
 - Clicking the map centers the main canvas on the selected location without resizing the minimap.
 - Redraws after Scene changes, canvas panning, zooming, token changes, visibility updates, and Fog of War updates.

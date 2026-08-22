@@ -44,6 +44,27 @@
   display: none;
 }
 
+.mel-minimap__token-info {
+  position: absolute;
+  left: 0.35rem;
+  top: 0.3rem;
+  max-width: calc(100% - 0.7rem);
+  overflow: hidden;
+  padding: 0.18rem 0.3rem;
+  border-radius: 0.25rem;
+  color: #fff;
+  background: rgb(0 0 0 / 72%);
+  font-size: 0.7rem;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.mel-minimap__token-info[hidden] {
+  display: none;
+}
+
 .mel-minimap__legend {
   position: absolute;
   right: 0.35rem;

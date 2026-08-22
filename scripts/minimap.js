@@ -37,11 +37,14 @@ class MelMinimap extends ApplicationV2 {
   #content = null;
   #mapCanvas = null;
   #status = null;
+  #tokenInfo = null;
   #context = null;
   #animationFrame = null;
   #imageCache = new Map();
   #lastSize = "";
   #fittedMapSignature = "";
+  #hoveredToken = null;
+  #pointerPosition = null;
 
   constructor(options = {}) {
     super(options);
@@ -56,10 +59,17 @@ class MelMinimap extends ApplicationV2 {
     canvasElement.className = "mel-minimap__canvas";
     canvasElement.setAttribute("aria-label", "Mel-Minimap");
     canvasElement.addEventListener("pointerdown", event => this.#panToMapPoint(event));
+    canvasElement.addEventListener("pointermove", event => this.#showTokenAtPointer(event));
+    canvasElement.addEventListener("pointerleave", () => this.#clearTokenHover());
+    canvasElement.addEventListener("pointercancel", () => this.#clearTokenHover());
 
     const status = document.createElement("div");
     status.className = "mel-minimap__status";
     status.hidden = true;
+
+    const tokenInfo = document.createElement("div");
+    tokenInfo.className = "mel-minimap__token-info";
+    tokenInfo.hidden = true;
 
     const legend = document.createElement("div");
     legend.className = "mel-minimap__legend";
@@ -76,7 +86,7 @@ class MelMinimap extends ApplicationV2 {
       legend.append(item);
     }
 
-    content.append(canvasElement, status, legend);
+    content.append(canvasElement, status, tokenInfo, legend);
     return content;
   }
 
@@ -85,6 +95,7 @@ class MelMinimap extends ApplicationV2 {
     this.#content = result;
     this.#mapCanvas = result.querySelector(".mel-minimap__canvas");
     this.#status = result.querySelector(".mel-minimap__status");
+    this.#tokenInfo = result.querySelector(".mel-minimap__token-info");
     this.#context = this.#mapCanvas.getContext("2d");
     // A render replaces the HTML canvas with a new element whose backing
     // buffer starts at the browser default of 300x150. Force the next draw
@@ -101,6 +112,7 @@ class MelMinimap extends ApplicationV2 {
 
   async _onClose() {
     this.#stopRefreshLoop();
+    this.#clearTokenHover();
     MelMinimap._instances.delete(this);
   }
 
@@ -146,12 +158,16 @@ class MelMinimap extends ApplicationV2 {
     const scene = globalThis.canvas?.scene;
     if (!dimensions || !scene || !globalThis.canvas?.initialized) {
       this.#setStatus(game.i18n.localize("MEL_MINIMAP.NoScene"));
+      this.#clearTokenHover();
       return;
     }
 
     this.#setStatus("");
     const map = this.#getMapBounds(dimensions, scene);
-    if (!map) return;
+    if (!map) {
+      this.#clearTokenHover();
+      return;
+    }
     const projection = this.#getMapProjection(map, width, height);
 
     context.save();
@@ -162,9 +178,10 @@ class MelMinimap extends ApplicationV2 {
     this.#drawMapBackground(context, scene, map);
     this.#drawGrid(context, dimensions, map);
     this.#drawFogMask(context, dimensions, scene, map);
-    this.#drawTokens(context, scene, map);
+    const tokenMarkers = this.#drawTokens(context, scene, map);
     context.restore();
 
+    this.#updateHoveredToken(tokenMarkers, map);
     this.#drawViewport(context, map, projection.toCanvasX, projection.toCanvasY, width, height);
     this.#drawBorder(context, projection.offsetX, projection.offsetY, map, projection.scale);
   }
@@ -353,30 +370,9 @@ class MelMinimap extends ApplicationV2 {
   }
 
   #drawTokens(context, scene, map) {
-    const tokens = globalThis.canvas?.tokens?.placeables ?? [];
-    const isGM = Boolean(game.user?.isGM);
-    const fogEnabled = this.#hasFogOfWar(scene);
-    for (const token of tokens) {
-      const document = token.document;
-      if (!document || (!token.visible && !isGM)) continue;
-      if (document.hidden && !isGM) continue;
-
-      const center = token.center ?? {
-        x: document.x + document.width * (globalThis.canvas.dimensions.size ?? 100) / 2,
-        y: document.y + document.height * (globalThis.canvas.dimensions.size ?? 100) / 2
-      };
-      if (!Number.isFinite(center.x) || !Number.isFinite(center.y)) continue;
-      if (!isGM && fogEnabled && !this.#isWorldPointVisible(center)) continue;
-
-      const gridSize = globalThis.canvas.dimensions.size ?? 100;
-      const tokenWidth = document.width * gridSize * map.width / map.worldWidth;
-      const tokenHeight = document.height * gridSize * map.height / map.worldHeight;
-      const radius = Math.max(8, Math.min(tokenWidth, tokenHeight) / 2);
-      const mapCenter = {
-        x: this.#worldToMapX(map, center.x),
-        y: this.#worldToMapY(map, center.y)
-      };
-      const self = this.#isOwnToken(token);
+    const markers = this.#getTokenMarkers(scene, map);
+    for (const marker of markers) {
+      const { token, document, mapCenter, radius, self } = marker;
       const color = self ? "#ffffff" : this.#dispositionColor(document.disposition);
       const alpha = document.hidden ? 0.42 : 0.95;
 
@@ -398,6 +394,133 @@ class MelMinimap extends ApplicationV2 {
       }
       context.restore();
     }
+    return markers;
+  }
+
+  #getTokenMarkers(scene, map) {
+    const dimensions = globalThis.canvas?.dimensions;
+    const tokens = globalThis.canvas?.tokens?.placeables ?? [];
+    if (!dimensions) return [];
+
+    const isGM = Boolean(game.user?.isGM);
+    const fogEnabled = this.#hasFogOfWar(scene);
+    const gridSize = Number(dimensions.size) || 100;
+    const markers = [];
+
+    for (const token of tokens) {
+      const document = token.document;
+      if (!document || (!token.visible && !isGM)) continue;
+      if (document.hidden && !isGM) continue;
+
+      const center = token.center ?? {
+        x: document.x + document.width * gridSize / 2,
+        y: document.y + document.height * gridSize / 2
+      };
+      if (!Number.isFinite(center.x) || !Number.isFinite(center.y)) continue;
+      if (!isGM && fogEnabled && !this.#isWorldPointVisible(center)) continue;
+
+      const tokenWidth = document.width * gridSize * map.width / map.worldWidth;
+      const tokenHeight = document.height * gridSize * map.height / map.worldHeight;
+      const radius = Math.max(8, Math.min(tokenWidth, tokenHeight) / 2);
+      markers.push({
+        token,
+        document,
+        mapCenter: {
+          x: this.#worldToMapX(map, center.x),
+          y: this.#worldToMapY(map, center.y)
+        },
+        radius,
+        self: this.#isOwnToken(token)
+      });
+    }
+    return markers;
+  }
+
+  #showTokenAtPointer(event) {
+    if (!this.#mapCanvas) return;
+    const dimensions = globalThis.canvas?.dimensions;
+    const scene = globalThis.canvas?.scene;
+    if (!dimensions || !scene || !globalThis.canvas?.initialized) {
+      this.#clearTokenHover();
+      return;
+    }
+
+    const map = this.#getMapBounds(dimensions, scene);
+    if (!map) return;
+
+    this.#pointerPosition = { clientX: event.clientX, clientY: event.clientY };
+    this.#updateHoveredToken(this.#getTokenMarkers(scene, map), map);
+  }
+
+  #clearTokenHover() {
+    this.#hoveredToken = null;
+    this.#pointerPosition = null;
+    this.#setTokenInfo(null);
+  }
+
+  #updateHoveredToken(markers, map) {
+    if (!this.#pointerPosition || !this.#mapCanvas) {
+      this.#setTokenInfo(null);
+      this.#hoveredToken = null;
+      return;
+    }
+
+    const rect = this.#mapCanvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const projection = this.#getMapProjection(map, rect.width, rect.height);
+    const canvasX = this.#pointerPosition.clientX - rect.left;
+    const canvasY = this.#pointerPosition.clientY - rect.top;
+    const hovered = [...markers].reverse().find(marker => {
+      const dx = canvasX - projection.toCanvasX(marker.mapCenter.x);
+      const dy = canvasY - projection.toCanvasY(marker.mapCenter.y);
+      const radius = Math.max(8, marker.radius * projection.scale);
+      return (dx * dx) + (dy * dy) <= radius * radius;
+    })?.token ?? null;
+
+    this.#hoveredToken = hovered;
+    this.#setTokenInfo(hovered);
+  }
+
+  #setTokenInfo(token) {
+    if (!this.#tokenInfo) return;
+    const text = token ? this.#getTokenInfoText(token) : "";
+    this.#tokenInfo.textContent = text;
+    this.#tokenInfo.hidden = !text;
+  }
+
+  #getTokenInfoText(token) {
+    const document = token?.document;
+    const name = String(token?.name ?? document?.name ?? "").trim();
+    if (!document || !name || !this.#isTokenNameVisible(token)) return "";
+
+    const dispositionKey = this.#dispositionLabelKey(document.disposition);
+    const disposition = game.i18n.localize(dispositionKey);
+    return `${name} (${disposition})`;
+  }
+
+  #isTokenNameVisible(token) {
+    const mode = token?.document?.displayName;
+    const displayModes = globalThis.CONST?.TOKEN_DISPLAY_MODES ?? {};
+    const isGM = Boolean(game.user?.isGM);
+    const isOwner = Boolean(token?.isOwner ?? token?.actor?.isOwner);
+    const isControlled = Boolean(token?.controlled);
+
+    if (mode === displayModes.NONE || mode === 0) return false;
+    if (mode === displayModes.CONTROL || mode === 10) return isControlled;
+    if (mode === displayModes.OWNER_HOVER || mode === 20) return isGM || isOwner;
+    if (mode === displayModes.HOVER || mode === 30) return true;
+    if (mode === displayModes.OWNER || mode === 40) return isGM || isOwner;
+    if (mode === displayModes.ALWAYS || mode === 50) return true;
+
+    // Foundry normally supplies a display mode. If a legacy or incomplete
+    // token document does not, use the rendered nameplate as a safe fallback.
+    return Boolean(isGM || token?.nameplate?.visible);
+  }
+
+  #dispositionLabelKey(disposition) {
+    if (disposition === CONST.TOKEN_DISPOSITIONS?.HOSTILE) return "MEL_MINIMAP.Legend.Opposition";
+    if (disposition === CONST.TOKEN_DISPOSITIONS?.NEUTRAL) return "MEL_MINIMAP.Legend.Neutral";
+    return "MEL_MINIMAP.Legend.Party";
   }
 
   #hasFogOfWar(scene) {
