@@ -35,6 +35,7 @@ Mel-Minimap follows the active Scene's visibility state for non-GM users:
 - Tokens inside masked areas are not displayed.
 - Hidden or otherwise invisible tokens are not displayed to non-GM users.
 - GMs can see hidden tokens; hidden GM-visible tokens are drawn with reduced opacity.
+- If the Scene's **Token Vision** setting is disabled, the complete map is shown to players regardless of the configured Exploration Mode.
 
 The Fog of War mask is sampled across the map for performance. Lighting, weather, animated effects, and video animation are not reproduced as a separate full Scene render.
 
@@ -136,4 +137,3 @@ The module uses Foundry VTT's `ApplicationV2`, Hooks, Scene Controls, the Canvas
 ## Validation
 
 The module is checked for JavaScript syntax, valid JSON manifests and language files, complete localization keys, and the expected Foundry-isolated module load.
-

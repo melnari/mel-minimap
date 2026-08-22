@@ -401,6 +401,10 @@ class MelMinimap extends ApplicationV2 {
   }
 
   #hasFogOfWar(scene) {
+    // When Token Vision is disabled for the Scene, players can see the full
+    // environment regardless of the configured Fog Exploration mode.
+    if (scene?.tokenVision === false) return false;
+
     const mode = scene?.fog?.mode;
     const disabledMode = globalThis.CONST?.FOG_EXPLORATION_MODES?.DISABLED ?? 0;
     if (mode !== undefined && mode !== null) return mode !== disabledMode;
