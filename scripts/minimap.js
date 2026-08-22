@@ -206,7 +206,13 @@ class MelMinimap extends ApplicationV2 {
     const sceneRect = dimensions.sceneRect;
     if (!sceneRect || !sceneRect.width || !sceneRect.height) return null;
 
-    const source = scene?.background?.src ?? scene?.background?.video;
+    // Foundry VTT 14 stores the displayed background on the currently
+    // viewed Level. Reading Scene#background here emits a deprecation warning
+    // and will stop working in a future Foundry release.
+    const level = globalThis.canvas?.level
+      ?? scene?.levels?.get?.(scene?.initialLevel)
+      ?? scene?.firstLevel;
+    const source = level?.background?.src ?? null;
     const image = source ? this.#getImage(source) : null;
     const width = image?.naturalWidth || sceneRect.width;
     const height = image?.naturalHeight || sceneRect.height;
@@ -302,7 +308,7 @@ class MelMinimap extends ApplicationV2 {
       return;
     }
 
-    const source = map.source ?? scene.background?.src ?? scene.background?.video;
+    const source = map.source;
     if (!source) {
       context.fillStyle = "#232323";
       context.fillRect(map.x, map.y, map.width, map.height);
