@@ -18,7 +18,7 @@ export function canViewActorSheet(actor, user = globalThis.game?.user, constants
 }
 
 export function isActorSheetShortcut(event) {
-  return Boolean(event?.ctrlKey && event.code === "KeyA" && !event.repeat);
+  return Boolean(event?.ctrlKey && event.code === "KeyS" && !event.repeat);
 }
 
 /**

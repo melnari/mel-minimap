@@ -10,11 +10,12 @@ const constants = {
   DOCUMENT_OWNERSHIP_LEVELS: { OBSERVER: 2 }
 };
 
-test("Ctrl+A is recognized only as a non-repeated control shortcut", () => {
-  assert.equal(isActorSheetShortcut({ ctrlKey: true, code: "KeyA", repeat: false }), true);
-  assert.equal(isActorSheetShortcut({ ctrlKey: false, code: "KeyA", repeat: false }), false);
+test("Ctrl+S is recognized only as a non-repeated control shortcut", () => {
+  assert.equal(isActorSheetShortcut({ ctrlKey: true, code: "KeyS", repeat: false }), true);
+  assert.equal(isActorSheetShortcut({ ctrlKey: false, code: "KeyS", repeat: false }), false);
+  assert.equal(isActorSheetShortcut({ ctrlKey: true, code: "KeyA", repeat: false }), false);
   assert.equal(isActorSheetShortcut({ ctrlKey: true, code: "KeyB", repeat: false }), false);
-  assert.equal(isActorSheetShortcut({ ctrlKey: true, code: "KeyA", repeat: true }), false);
+  assert.equal(isActorSheetShortcut({ ctrlKey: true, code: "KeyS", repeat: true }), false);
 });
 
 test("Observer permission allows the hovered Actor Sheet to open", () => {

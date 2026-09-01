@@ -22,7 +22,7 @@ The module manifest targets Foundry VTT 14 and is verified with Foundry VTT 14.3
   - Self: the controlled token or the token belonging to the user's character
 - Highlights the user's own token with a white marker and blue outline.
 - Shows a hovered token's name and localized disposition at the top-left of the minimap, subject to Foundry's token name-display setting and player permissions.
-- Opens the hovered Token's Actor Sheet with `Ctrl+A` when the current user has at least Observer permission for that Actor.
+- Opens the hovered Token's Actor Sheet with `Ctrl+S` when the current user has at least Observer permission for that Actor.
 - Shows the currently visible main-canvas area as a translucent white frame.
 - Clicking the map centers the main canvas on the selected location without resizing the minimap.
 - Redraws after Scene changes, canvas panning, zooming, token changes, visibility updates, and Fog of War updates.
@@ -59,7 +59,7 @@ Use one of the following controls to toggle the minimap:
 - Click the Mel-Minimap button in the Scene Controls.
 - Press `Ctrl+M`.
 - Click anywhere inside the map to center the main canvas on that point.
-- Hover over a token marker and press `Ctrl+A` to open its Actor Sheet, if you have permission to view that Actor.
+- Hover over a token marker and press `Ctrl+S` to open its Actor Sheet, if you have permission to view that Actor.
 
 Panning the main canvas changes only the viewport frame. It does not change the minimap size or scale.
 
