@@ -3,6 +3,7 @@
   "MEL_MINIMAP.Toggle": "Amosar o minimapa",
   "MEL_MINIMAP.AutoOpen": "Abrir o minimapa ao iniciar o mundo",
   "MEL_MINIMAP.ShowBackground": "Amosar o fondo do mapa",
+  "MEL_MINIMAP.ShowMapNotes": "Amosar as notas do mapa",
   "MEL_MINIMAP.NoScene": "Non hai ningunha escena activa",
   "MEL_MINIMAP.NoCanvas": "O lenzo aínda non está listo",
   "MEL_MINIMAP.Legend.Party": "Grupo",

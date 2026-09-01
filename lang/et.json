@@ -3,6 +3,7 @@
   "MEL_MINIMAP.Toggle": "Kuva minikaarti",
   "MEL_MINIMAP.AutoOpen": "Ava minikaart maailma käivitamisel",
   "MEL_MINIMAP.ShowBackground": "Kuva kaardi tausta",
+  "MEL_MINIMAP.ShowMapNotes": "Kuva kaardimärkmeid",
   "MEL_MINIMAP.NoScene": "Aktiivne stseen puudub",
   "MEL_MINIMAP.NoCanvas": "Lõuend pole veel valmis",
   "MEL_MINIMAP.Legend.Party": "Grupp",

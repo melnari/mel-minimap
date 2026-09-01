@@ -3,6 +3,7 @@
   "MEL_MINIMAP.Toggle": "แสดงแผนที่ย่อ",
   "MEL_MINIMAP.AutoOpen": "เปิดแผนที่ย่อเมื่อเริ่มโลก",
   "MEL_MINIMAP.ShowBackground": "แสดงพื้นหลังแผนที่",
+  "MEL_MINIMAP.ShowMapNotes": "แสดงบันทึกแผนที่",
   "MEL_MINIMAP.NoScene": "ไม่มีฉากที่ใช้งานอยู่",
   "MEL_MINIMAP.NoCanvas": "แคนวาสยังไม่พร้อม",
   "MEL_MINIMAP.Legend.Party": "กลุ่มผู้เล่น",

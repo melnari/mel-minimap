@@ -3,6 +3,7 @@
   "MEL_MINIMAP.Toggle": "Minitérkép megjelenítése",
   "MEL_MINIMAP.AutoOpen": "Minitérkép megnyitása a világ indításakor",
   "MEL_MINIMAP.ShowBackground": "Térképháttér megjelenítése",
+  "MEL_MINIMAP.ShowMapNotes": "Térképes jegyzetek megjelenítése",
   "MEL_MINIMAP.NoScene": "Nincs aktív jelenet",
   "MEL_MINIMAP.NoCanvas": "A vászon még nem áll készen",
   "MEL_MINIMAP.Legend.Party": "Csapat",

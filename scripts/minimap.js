@@ -8,6 +8,12 @@ import {
   openActorSheetForToken,
   shareActorArtworkForToken
 } from "./actor-sheet.mjs";
+import {
+  getMapNoteIcon,
+  getMapNoteIconSize,
+  getMapNoteText,
+  openMapNoteJournal
+} from "./map-note.mjs";
 
 const MODULE_ID = "mel-minimap";
 const MINIMAP_ID = `${MODULE_ID}-window`;
@@ -55,6 +61,7 @@ class MelMinimap extends ApplicationV2 {
   #lastSize = "";
   #fittedMapSignature = "";
   #hoveredToken = null;
+  #hoveredNote = null;
   #pointerPosition = null;
   #keyListenerAttached = false;
   #handleKeyDown = event => this.#handleKeyboardShortcut(event);
@@ -193,10 +200,11 @@ class MelMinimap extends ApplicationV2 {
     this.#drawMapBackground(context, scene, map);
     this.#drawGrid(context, dimensions, map);
     this.#drawFogMask(context, dimensions, scene, map);
+    const noteMarkers = this.#drawMapNotes(context, scene, map);
     const tokenMarkers = this.#drawTokens(context, scene, map);
     context.restore();
 
-    this.#updateHoveredToken(tokenMarkers, map);
+    this.#updateHoveredTarget(tokenMarkers, noteMarkers, map);
     this.#drawViewport(context, map, projection.toCanvasX, projection.toCanvasY, width, height);
     this.#drawBorder(context, projection.offsetX, projection.offsetY, map, projection.scale);
   }
@@ -418,6 +426,76 @@ class MelMinimap extends ApplicationV2 {
     return markers;
   }
 
+  #drawMapNotes(context, scene, map) {
+    const markers = this.#getMapNoteMarkers(scene, map);
+    for (const marker of markers) {
+      const { note, mapCenter, size, icon } = marker;
+      const image = this.#getImage(icon);
+      const left = mapCenter.x - size / 2;
+      const top = mapCenter.y - size / 2;
+
+      context.save();
+      context.globalAlpha = 0.96;
+      if (image?.complete && image.naturalWidth) {
+        // Keep the original Note icon square and scale it uniformly with the
+        // complete scene map, just as Foundry renders the source icon.
+        context.drawImage(image, left, top, size, size);
+      } else {
+        context.beginPath();
+        context.arc(mapCenter.x, mapCenter.y, size / 2, 0, Math.PI * 2);
+        context.fillStyle = "rgb(255 255 255 / 88%)";
+        context.fill();
+        context.strokeStyle = "#171717";
+        context.lineWidth = Math.max(1, size * 0.08);
+        context.stroke();
+      }
+      context.restore();
+    }
+    return markers;
+  }
+
+  #getMapNoteMarkers(scene, map) {
+    if (!game.settings.get(MODULE_ID, "showMapNotes")) return [];
+
+    const notes = globalThis.canvas?.notes?.placeables ?? [];
+    const isGM = Boolean(game.user?.isGM);
+    const fogEnabled = this.#hasFogOfWar(scene);
+    const scale = Math.min(map.width / map.worldWidth, map.height / map.worldHeight);
+    const markers = [];
+
+    for (const note of notes) {
+      const document = note?.document;
+      if (!document) continue;
+
+      // Foundry's NotesLayer already applies the note's visibility rules. The
+      // explicit checks also protect against placeable test doubles and keep
+      // hidden note icons out of player minimaps.
+      const visible = note.visible ?? note.isVisible;
+      if (visible === false && !isGM) continue;
+      if (!isGM && !document.global && fogEnabled) {
+        const point = { x: Number(document.x), y: Number(document.y) };
+        if (!Number.isFinite(point.x) || !Number.isFinite(point.y)) continue;
+        if (!this.#isWorldPointVisible(point)) continue;
+      }
+
+      const x = Number(document.x);
+      const y = Number(document.y);
+      if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+
+      markers.push({
+        note,
+        document,
+        icon: getMapNoteIcon(note),
+        size: Math.max(8, getMapNoteIconSize(note) * scale),
+        mapCenter: {
+          x: this.#worldToMapX(map, x),
+          y: this.#worldToMapY(map, y)
+        }
+      });
+    }
+    return markers;
+  }
+
   #getTokenMarkers(scene, map) {
     const dimensions = globalThis.canvas?.dimensions;
     const tokens = globalThis.canvas?.tokens?.placeables ?? [];
@@ -470,11 +548,16 @@ class MelMinimap extends ApplicationV2 {
     if (!map) return;
 
     this.#pointerPosition = { clientX: event.clientX, clientY: event.clientY };
-    this.#updateHoveredToken(this.#getTokenMarkers(scene, map), map);
+    this.#updateHoveredTarget(
+      this.#getTokenMarkers(scene, map),
+      this.#getMapNoteMarkers(scene, map),
+      map
+    );
   }
 
   #clearTokenHover() {
     this.#hoveredToken = null;
+    this.#hoveredNote = null;
     this.#pointerPosition = null;
     this.#setTokenInfo(null);
   }
@@ -495,7 +578,10 @@ class MelMinimap extends ApplicationV2 {
     if (typeof this.#mapCanvas?.matches === "function" && !this.#mapCanvas.matches(":hover")) return;
 
     if (isActorSheetShortcut(event)) {
-      if (!openActorSheetForToken(this.#hoveredToken)) return;
+      const opened = this.#hoveredNote
+        ? openMapNoteJournal(this.#hoveredNote)
+        : openActorSheetForToken(this.#hoveredToken);
+      if (!opened) return;
       event.preventDefault();
       event.stopPropagation();
       return;
@@ -521,10 +607,11 @@ class MelMinimap extends ApplicationV2 {
     });
   }
 
-  #updateHoveredToken(markers, map) {
+  #updateHoveredTarget(tokenMarkers, noteMarkers, map) {
     if (!this.#pointerPosition || !this.#mapCanvas) {
       this.#setTokenInfo(null);
       this.#hoveredToken = null;
+      this.#hoveredNote = null;
       return;
     }
 
@@ -533,20 +620,41 @@ class MelMinimap extends ApplicationV2 {
     const projection = this.#getMapProjection(map, rect.width, rect.height);
     const canvasX = this.#pointerPosition.clientX - rect.left;
     const canvasY = this.#pointerPosition.clientY - rect.top;
-    const hovered = [...markers].reverse().find(marker => {
+    const containsMarker = marker => {
       const dx = canvasX - projection.toCanvasX(marker.mapCenter.x);
       const dy = canvasY - projection.toCanvasY(marker.mapCenter.y);
-      const radius = Math.max(8, marker.radius * projection.scale);
+      const radius = Math.max(8, (marker.radius ?? marker.size / 2) * projection.scale);
       return (dx * dx) + (dy * dy) <= radius * radius;
-    })?.token ?? null;
+    };
 
-    this.#hoveredToken = hovered;
-    this.#setTokenInfo(hovered);
+    // Notes are checked first because their icons are an interface layer in
+    // Foundry and should remain individually addressable if they overlap a
+    // token marker in the minimap.
+    const hoveredNote = [...noteMarkers].reverse().find(containsMarker)?.note ?? null;
+    if (hoveredNote) {
+      this.#hoveredNote = hoveredNote;
+      this.#hoveredToken = null;
+      this.#setMapNoteInfo(hoveredNote);
+      return;
+    }
+
+    const hoveredToken = [...tokenMarkers].reverse().find(containsMarker)?.token ?? null;
+
+    this.#hoveredNote = null;
+    this.#hoveredToken = hoveredToken;
+    this.#setTokenInfo(hoveredToken);
   }
 
   #setTokenInfo(token) {
     if (!this.#tokenInfo) return;
     const text = token ? this.#getTokenInfoText(token) : "";
+    this.#tokenInfo.textContent = text;
+    this.#tokenInfo.hidden = !text;
+  }
+
+  #setMapNoteInfo(note) {
+    if (!this.#tokenInfo) return;
+    const text = getMapNoteText(note);
     this.#tokenInfo.textContent = text;
     this.#tokenInfo.hidden = !text;
   }
@@ -767,6 +875,18 @@ Hooks.once("init", () => {
     default: true
   });
 
+  game.settings.register(MODULE_ID, "showMapNotes", {
+    name: "MEL_MINIMAP.ShowMapNotes",
+    hint: "",
+    scope: "client",
+    config: true,
+    type: Boolean,
+    default: false,
+    onChange: () => {
+      for (const minimap of MelMinimap._instances) minimap.redraw();
+    }
+  });
+
   game.keybindings.register(MODULE_ID, "toggleMinimap", {
     name: "MEL_MINIMAP.Toggle",
     editable: [{ key: "KeyM", modifiers: ["Control"] }],
@@ -804,6 +924,10 @@ for (const hook of [
   "createToken",
   "updateToken",
   "deleteToken",
+  "refreshNote",
+  "createNote",
+  "updateNote",
+  "deleteNote",
   "updateScene",
   "visibilityRefresh",
   "sightRefresh",

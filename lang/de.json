@@ -3,6 +3,7 @@
   "MEL_MINIMAP.Toggle": "Minikarte anzeigen",
   "MEL_MINIMAP.AutoOpen": "Minikarte beim Weltstart öffnen",
   "MEL_MINIMAP.ShowBackground": "Kartenhintergrund anzeigen",
+  "MEL_MINIMAP.ShowMapNotes": "Map-Notizen anzeigen",
   "MEL_MINIMAP.NoScene": "Keine aktive Scene",
   "MEL_MINIMAP.NoCanvas": "Canvas ist noch nicht bereit",
   "MEL_MINIMAP.Legend.Party": "Verbündet",

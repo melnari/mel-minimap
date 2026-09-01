@@ -3,6 +3,7 @@
   "MEL_MINIMAP.Toggle": "Rādīt minikarti",
   "MEL_MINIMAP.AutoOpen": "Atvērt minikarti, sākoties pasaulei",
   "MEL_MINIMAP.ShowBackground": "Rādīt kartes fonu",
+  "MEL_MINIMAP.ShowMapNotes": "Rādīt kartes piezīmes",
   "MEL_MINIMAP.NoScene": "Nav aktīvas ainas",
   "MEL_MINIMAP.NoCanvas": "Kanva vēl nav gatava",
   "MEL_MINIMAP.Legend.Party": "Grupa",

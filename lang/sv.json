@@ -3,6 +3,7 @@
   "MEL_MINIMAP.Toggle": "Visa minikarta",
   "MEL_MINIMAP.AutoOpen": "Öppna minikartan när världen startar",
   "MEL_MINIMAP.ShowBackground": "Visa kartbakgrund",
+  "MEL_MINIMAP.ShowMapNotes": "Visa kartanteckningar",
   "MEL_MINIMAP.NoScene": "Ingen aktiv scen",
   "MEL_MINIMAP.NoCanvas": "Canvasen är inte redo ännu",
   "MEL_MINIMAP.Legend.Party": "Gruppen",

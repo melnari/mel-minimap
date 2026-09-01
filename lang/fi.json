@@ -3,6 +3,7 @@
   "MEL_MINIMAP.Toggle": "Näytä minikartta",
   "MEL_MINIMAP.AutoOpen": "Avaa minikartta maailman käynnistyessä",
   "MEL_MINIMAP.ShowBackground": "Näytä kartan tausta",
+  "MEL_MINIMAP.ShowMapNotes": "Näytä karttamuistiinpanot",
   "MEL_MINIMAP.NoScene": "Aktiivista kohtausta ei ole",
   "MEL_MINIMAP.NoCanvas": "Piirtoalusta ei ole vielä valmis",
   "MEL_MINIMAP.Legend.Party": "Ryhmä",

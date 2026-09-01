@@ -3,6 +3,7 @@
   "MEL_MINIMAP.Toggle": "Rodyti minimapę",
   "MEL_MINIMAP.AutoOpen": "Atidaryti minimapę paleidus pasaulį",
   "MEL_MINIMAP.ShowBackground": "Rodyti žemėlapio foną",
+  "MEL_MINIMAP.ShowMapNotes": "Rodyti žemėlapio pastabas",
   "MEL_MINIMAP.NoScene": "Nėra aktyvios scenos",
   "MEL_MINIMAP.NoCanvas": "Drobė dar neparengta",
   "MEL_MINIMAP.Legend.Party": "Grupė",

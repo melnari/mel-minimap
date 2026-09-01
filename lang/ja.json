@@ -3,6 +3,7 @@
   "MEL_MINIMAP.Toggle": "ミニマップを表示",
   "MEL_MINIMAP.AutoOpen": "ワールド開始時にミニマップを開く",
   "MEL_MINIMAP.ShowBackground": "マップの背景を表示",
+  "MEL_MINIMAP.ShowMapNotes": "マップノートを表示",
   "MEL_MINIMAP.NoScene": "アクティブなシーンがありません",
   "MEL_MINIMAP.NoCanvas": "キャンバスはまだ準備できていません",
   "MEL_MINIMAP.Legend.Party": "パーティ",

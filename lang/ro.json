@@ -3,6 +3,7 @@
   "MEL_MINIMAP.Toggle": "Afișează minimapa",
   "MEL_MINIMAP.AutoOpen": "Deschide minimapa la pornirea lumii",
   "MEL_MINIMAP.ShowBackground": "Afișează fundalul hărții",
+  "MEL_MINIMAP.ShowMapNotes": "Afișează notițele hărții",
   "MEL_MINIMAP.NoScene": "Nu există nicio scenă activă",
   "MEL_MINIMAP.NoCanvas": "Canvasul nu este încă pregătit",
   "MEL_MINIMAP.Legend.Party": "Grup",

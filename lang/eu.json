@@ -3,6 +3,7 @@
   "MEL_MINIMAP.Toggle": "Erakutsi minimapa",
   "MEL_MINIMAP.AutoOpen": "Ireki minimapa mundua abiaraztean",
   "MEL_MINIMAP.ShowBackground": "Erakutsi maparen atzeko planoa",
+  "MEL_MINIMAP.ShowMapNotes": "Erakutsi mapako oharrak",
   "MEL_MINIMAP.NoScene": "Ez dago eszena aktiborik",
   "MEL_MINIMAP.NoCanvas": "Oihala ez dago prest oraindik",
   "MEL_MINIMAP.Legend.Party": "Taldea",

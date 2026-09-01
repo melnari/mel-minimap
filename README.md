@@ -1,75 +1,125 @@
 # Mel-Minimap
 
-Mel-Minimap is an add-on module for Foundry Virtual Tabletop 14.x. It displays the active Scene as a compact, movable overview map with token markers and a frame showing the current canvas viewport.
+Mel-Minimap is a Foundry Virtual Tabletop module that displays the complete active Scene in a compact overview window. The minimap preserves the original map aspect ratio, shows relevant Tokens and Map Notes, and marks the portion of the Scene currently visible on the main canvas.
 
-The module manifest targets Foundry VTT 14 and is verified with Foundry VTT 14.367.
+## Compatibility
+
+- Module version: `1.0.5`
+- Foundry Virtual Tabletop: `14.x`
+- Verified with Foundry Virtual Tabletop `14.367`
 
 ## Features
 
-- Displays the complete active Scene background using the original image aspect ratio.
+### Scene overview
+
+- Displays the complete background of the active Scene or viewed Level.
+- Preserves the original image aspect ratio. The map is never stretched.
 - Uses a normal scale of 10% of the source image dimensions.
-- Ensures a minimum of 300 pixels on the shorter map edge when this is compatible with the maximum size.
-- Limits the outer minimap window to a maximum of 350 × 350 pixels. Large or extreme-aspect-ratio maps are scaled down proportionally.
-- Preserves the map aspect ratio at all times; the map is never stretched.
-- Starts with a 300 × 300 pixel window and adapts its content size automatically.
-- Movable and minimizable Foundry `ApplicationV2` window.
-- No manual resizing is required or enabled.
-- Displays the Scene background and grid when enabled.
-- Displays visible tokens using disposition colors:
-  - Party: friendly tokens
-  - Neutral: neutral tokens
-  - Opposition: hostile tokens
-  - Self: the controlled token or the token belonging to the user's character
-- Highlights the user's own token with a white marker and blue outline.
-- Shows a hovered token's name and localized disposition at the top-left of the minimap, subject to Foundry's token name-display setting and player permissions.
-- Opens the hovered Token's Actor Sheet with `Ctrl+S` when the current user has at least Observer permission for that Actor.
-- Opens the hovered Actor's artwork locally with `Ctrl+1` when the current user has permission to view the Actor.
-- Allows a GM to show the hovered Actor's artwork to all connected players with `Ctrl+2`.
-- Shows the currently visible main-canvas area as a translucent white frame.
-- Clicking the map centers the main canvas on the selected location without resizing the minimap.
-- Redraws after Scene changes, canvas panning, zooming, token changes, visibility updates, and Fog of War updates.
-- Opens and closes through the Scene Controls button or `Ctrl+M`.
-- Provides settings for automatic opening and background rendering.
+- Keeps the shorter map edge at least 300 pixels where possible.
+- Scales very large maps down proportionally so the outer window does not exceed 350 × 350 pixels.
+- Gives the map the maximum possible size when an extreme aspect ratio prevents both size limits from being met.
+- Fits the map automatically. Manual resizing is not required or enabled.
+- Displays the configured grid and a translucent white frame around the current main-canvas viewport.
+- Can be moved or minimized like any other Foundry `ApplicationV2` window.
+- Clicking the minimap centers the main canvas on the selected position without changing the minimap's size or aspect ratio.
 
-## Fog of War and token visibility
+### Tokens
 
-Mel-Minimap follows the active Scene's visibility state for non-GM users:
+Visible Tokens are displayed as compact markers using Foundry disposition colors:
 
-- Unexplored or currently invisible map areas are masked.
-- Tokens inside masked areas are not displayed.
-- Hidden or otherwise invisible tokens are not displayed to non-GM users.
-- GMs can see hidden tokens; hidden GM-visible tokens are drawn with reduced opacity.
-- If the Scene's **Token Vision** setting is disabled, the complete map is shown to players regardless of the configured Exploration Mode.
+- **Party** for friendly Tokens
+- **Neutral** for neutral Tokens
+- **Opposition** for hostile Tokens
+- **Self** for the controlled Token or the Token belonging to the current user's character
 
-The Fog of War mask is sampled across the map for performance. Lighting, weather, animated effects, and video animation are not reproduced as a separate full Scene render.
+The user's own Token is highlighted with a white marker and blue outline. Hovering over a Token displays its name and localized disposition in the top-left information area, subject to Foundry's Token name-display mode and the user's permissions.
+
+### Map Notes
+
+Map Notes use their configured Foundry icon and `iconSize`, scaled proportionally to the complete Scene. The feature is controlled by the client setting **Show Map Notes**, which is disabled by default.
+
+When the pointer hovers over a Map Note, its custom Note text or linked Journal title is shown in the top-left information area. Pressing `Ctrl+S` opens the linked Journal Entry and, when configured, its linked Journal Entry Page.
+
+### Actor Sheets and artwork
+
+- `Ctrl+S` opens the Actor Sheet for a hovered Token when the current user has at least Observer permission for that Actor.
+- `Ctrl+1` opens the hovered Actor's artwork locally when the current user may view that Actor.
+- `Ctrl+2` allows a GM to open and share the hovered Actor's artwork with all connected players.
 
 ## Installation
 
-1. Copy this project folder into `Data/modules/` and keep the folder name `mel-minimap`.
-2. Restart Foundry VTT.
-3. Enable **Mel-Minimap** in the target World.
-4. The minimap opens automatically when the World starts unless automatic opening has been disabled in the module settings.
+### Install from Foundry's module browser
 
-When upgrading from an older development build with a different module ID, disable or remove the old build first. The current module ID is `mel-minimap`.
+If the module is available in Foundry's package browser, install **Mel-Minimap** from **Add-on Modules**.
+
+### Install with a manifest URL
+
+In Foundry, open **Add-on Modules → Install Module**, enter the following Manifest URL, and select **Install**:
+
+```text
+https://raw.githubusercontent.com/melnari/mel-minimap/main/module.json
+```
+
+The manifest points to the published GitHub release archive.
+
+### Manual installation
+
+1. Download the module release archive.
+2. Extract the `mel-minimap` folder into Foundry's `Data/modules/` directory.
+3. Restart Foundry VTT.
+4. Enable **Mel-Minimap** in the target World.
+
+The installed folder must be named `mel-minimap`, matching the module ID in `module.json`.
+
+## Configuration
+
+The settings are client-specific and can be found in Foundry's module settings:
+
+- **Open minimap when the world starts**: Opens the minimap automatically after the World is ready. Enabled by default.
+- **Show map background**: Displays the active Scene background in the minimap. Enabled by default.
+- **Show Map Notes**: Displays visible Map Note markers and enables Map Note hover actions. Disabled by default.
+
+Changing **Show Map Notes** updates open minimaps immediately.
 
 ## Usage
 
-Move the minimap window like any other Foundry window. Its map surface is fitted automatically to the source image while preserving the original aspect ratio.
+### Minimap controls
 
-Use one of the following controls to toggle the minimap:
+| Action | Result |
+|---|---|
+| Scene Controls button | Opens or closes the minimap |
+| `Ctrl+M` | Opens or closes the minimap |
+| Click inside the map | Centers the main canvas on that position |
+| Move the pointer over a Token | Shows the Token name and disposition |
+| Move the pointer over a Map Note | Shows the Note text or linked Journal title |
 
-- Click the Mel-Minimap button in the Scene Controls.
-- Press `Ctrl+M`.
-- Click anywhere inside the map to center the main canvas on that point.
-- Hover over a token marker and press `Ctrl+S` to open its Actor Sheet, if you have permission to view that Actor.
-- Hover over a token marker and press `Ctrl+1` to open the Actor's artwork locally, if you have permission to view that Actor.
-- A GM can press `Ctrl+2` to open and share the Actor's artwork with all connected players.
+### Keyboard shortcuts for hovered objects
 
-Panning the main canvas changes only the viewport frame. It does not change the minimap size or scale.
+| Shortcut | Hovered Token | Hovered Map Note |
+|---|---|---|
+| `Ctrl+S` | Opens the Actor Sheet when permitted | Opens the linked Journal Entry or Journal Entry Page when permitted |
+| `Ctrl+1` | Opens the Actor's artwork locally when permitted | No action |
+| `Ctrl+2` | A GM shares the Actor's artwork with all connected players | No action |
+
+The shortcut only applies while the pointer is over the minimap. If the current user does not have the required permission, the shortcut is ignored.
+
+## Visibility and Fog of War
+
+Mel-Minimap follows Foundry's current Scene visibility state for non-GM users:
+
+- Unexplored or currently invisible areas are masked.
+- Tokens inside masked areas are not displayed.
+- Hidden or otherwise invisible Tokens are not displayed to players.
+- Non-global Map Notes in unexplored or currently invisible areas are not displayed to players.
+- Global Map Notes follow Foundry's global visibility behavior.
+- GMs can see content that is hidden from players; hidden Token markers use reduced opacity.
+- If the Scene's **Token Vision** setting is disabled, players see the complete map regardless of **Exploration Mode**.
+
+The Fog of War mask is sampled across the map for performance. Lighting, weather, animated effects, and video animation are not reproduced as a separate full Scene render.
 
 ## Localization
 
-The module includes 37 localization files. The list contains the 24 official European Union languages previously supported by the module plus additional Foundry/community language codes.
+Mel-Minimap includes 37 localization files. This includes the supported European Union languages and additional Foundry or community language codes.
 
 | Code | Language | File |
 |---|---|---|
@@ -111,39 +161,48 @@ The module includes 37 localization files. The list contains the 24 official Eur
 | uk | Українська | `lang/uk.json` |
 | zh | 中文 | `lang/zh.json` |
 
-The legend uses the following localization keys in every language file:
+The main localization keys include:
 
+- `MEL_MINIMAP.Toggle`
+- `MEL_MINIMAP.AutoOpen`
+- `MEL_MINIMAP.ShowBackground`
+- `MEL_MINIMAP.ShowMapNotes`
 - `MEL_MINIMAP.Legend.Party`
 - `MEL_MINIMAP.Legend.Neutral`
 - `MEL_MINIMAP.Legend.Opposition`
 - `MEL_MINIMAP.Legend.Self`
 
-## Technical structure
+## Project structure
 
 ```text
 mel-minimap/
 ├── module.json
 ├── README.md
 ├── lang/
-│   ├── ar.json  ├── bg.json  ├── ca.json  ├── ceb.json
-│   ├── cs.json  ├── da.json  ├── de.json  ├── el.json
-│   ├── en.json  ├── es.json  ├── et.json  ├── eu.json
-│   ├── fi.json  ├── fr.json  ├── ga.json  ├── gl.json
-│   ├── hi.json  ├── hr.json  ├── hu.json  ├── it.json
-│   ├── ja.json  ├── ko.json  ├── lt.json  ├── lv.json
-│   ├── mt.json  ├── nl.json  ├── pl.json  ├── pt.json
-│   ├── ro.json  ├── ru.json  ├── sk.json  ├── sl.json
-│   ├── sv.json  ├── th.json  ├── tr.json  ├── uk.json
-│   └── zh.json
-├── scripts/minimap.js
-├── scripts/actor-sheet.mjs
+├── scripts/
+│   ├── minimap.js
+│   ├── actor-sheet.mjs
+│   └── map-note.mjs
 ├── tests/
-│   └── actor-sheet.test.mjs
+│   ├── actor-sheet.test.mjs
+│   └── map-note.test.mjs
 └── styles/minimap.css
 ```
 
-The module uses Foundry VTT's `ApplicationV2`, Hooks, Scene Controls, the Canvas API, and a dedicated HTML canvas. It does not modify the active Scene document or add a second PIXI layer to the main canvas. Actor Sheet and artwork access use Foundry's document permission API, registered document sheets, and the native `ImagePopout` application.
+The module uses Foundry's `ApplicationV2`, Hooks, Scene Controls, Canvas APIs, registered document sheets, the document permission API, and a dedicated HTML canvas. It does not modify the active Scene document or add a second PIXI layer to the main canvas.
 
-## Validation
+## Development and validation
 
-The module is checked for JavaScript syntax, valid JSON manifests and language files, complete localization keys, Actor Sheet and artwork permission/hotkey behavior, and the expected Foundry-isolated module load. Run the unit tests with `node --test tests/actor-sheet.test.mjs`.
+No build step is required. The module can be tested directly from the project directory.
+
+Run the unit tests:
+
+```bash
+node --test tests/*.test.mjs
+```
+
+The validation suite covers Actor Sheet and artwork permissions, keyboard shortcuts, Map Note resolution, Journal permissions, Journal Page opening, JavaScript syntax, and JSON validity.
+
+## License
+
+See [LICENSE](LICENSE).
