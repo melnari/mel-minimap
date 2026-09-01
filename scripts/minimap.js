@@ -1,3 +1,5 @@
+import { isActorSheetShortcut, openActorSheetForToken } from "./actor-sheet.mjs";
+
 const MODULE_ID = "mel-minimap";
 const MINIMAP_ID = `${MODULE_ID}-window`;
 const DEFAULT_SIZE = 300;
@@ -45,6 +47,8 @@ class MelMinimap extends ApplicationV2 {
   #fittedMapSignature = "";
   #hoveredToken = null;
   #pointerPosition = null;
+  #keyListenerAttached = false;
+  #handleKeyDown = event => this.#openHoveredActorSheet(event);
 
   constructor(options = {}) {
     super(options);
@@ -104,6 +108,7 @@ class MelMinimap extends ApplicationV2 {
   }
 
   async _onRender() {
+    this.#attachKeyListener();
     this.#startRefreshLoop();
     const map = this.#getMapBounds(globalThis.canvas?.dimensions, globalThis.canvas?.scene);
     if (map) this.#fitWindowToMap(map);
@@ -112,6 +117,7 @@ class MelMinimap extends ApplicationV2 {
 
   async _onClose() {
     this.#stopRefreshLoop();
+    this.#detachKeyListener();
     this.#clearTokenHover();
     MelMinimap._instances.delete(this);
   }
@@ -462,6 +468,27 @@ class MelMinimap extends ApplicationV2 {
     this.#hoveredToken = null;
     this.#pointerPosition = null;
     this.#setTokenInfo(null);
+  }
+
+  #attachKeyListener() {
+    if (this.#keyListenerAttached) return;
+    window.addEventListener("keydown", this.#handleKeyDown);
+    this.#keyListenerAttached = true;
+  }
+
+  #detachKeyListener() {
+    if (!this.#keyListenerAttached) return;
+    window.removeEventListener("keydown", this.#handleKeyDown);
+    this.#keyListenerAttached = false;
+  }
+
+  #openHoveredActorSheet(event) {
+    if (!isActorSheetShortcut(event)) return;
+    if (typeof this.#mapCanvas?.matches === "function" && !this.#mapCanvas.matches(":hover")) return;
+    if (!openActorSheetForToken(this.#hoveredToken)) return;
+
+    event.preventDefault();
+    event.stopPropagation();
   }
 
   #updateHoveredToken(markers, map) {
