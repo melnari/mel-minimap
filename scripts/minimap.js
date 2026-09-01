@@ -1,4 +1,13 @@
-import { isActorSheetShortcut, openActorSheetForToken } from "./actor-sheet.mjs";
+import {
+  canShareActorArtwork,
+  canViewActorSheet,
+  getActorArtwork,
+  getActorArtworkShortcut,
+  isActorSheetShortcut,
+  openActorArtworkForToken,
+  openActorSheetForToken,
+  shareActorArtworkForToken
+} from "./actor-sheet.mjs";
 
 const MODULE_ID = "mel-minimap";
 const MINIMAP_ID = `${MODULE_ID}-window`;
@@ -48,7 +57,7 @@ class MelMinimap extends ApplicationV2 {
   #hoveredToken = null;
   #pointerPosition = null;
   #keyListenerAttached = false;
-  #handleKeyDown = event => this.#openHoveredActorSheet(event);
+  #handleKeyDown = event => this.#handleKeyboardShortcut(event);
 
   constructor(options = {}) {
     super(options);
@@ -482,13 +491,34 @@ class MelMinimap extends ApplicationV2 {
     this.#keyListenerAttached = false;
   }
 
-  #openHoveredActorSheet(event) {
-    if (!isActorSheetShortcut(event)) return;
+  #handleKeyboardShortcut(event) {
     if (typeof this.#mapCanvas?.matches === "function" && !this.#mapCanvas.matches(":hover")) return;
-    if (!openActorSheetForToken(this.#hoveredToken)) return;
+
+    if (isActorSheetShortcut(event)) {
+      if (!openActorSheetForToken(this.#hoveredToken)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    const artworkAction = getActorArtworkShortcut(event);
+    if (!artworkAction) return;
+
+    const token = this.#hoveredToken;
+    const allowed = artworkAction === "share"
+      ? canShareActorArtwork(token)
+      : Boolean(canViewActorSheet(token?.actor) && getActorArtwork(token?.actor, token));
+    if (!allowed) return;
 
     event.preventDefault();
     event.stopPropagation();
+
+    const operation = artworkAction === "share"
+      ? shareActorArtworkForToken(token)
+      : openActorArtworkForToken(token);
+    void operation.catch(error => {
+      console.error(`${MODULE_ID} could not open Actor artwork`, error);
+    });
   }
 
   #updateHoveredToken(markers, map) {

@@ -23,6 +23,8 @@ The module manifest targets Foundry VTT 14 and is verified with Foundry VTT 14.3
 - Highlights the user's own token with a white marker and blue outline.
 - Shows a hovered token's name and localized disposition at the top-left of the minimap, subject to Foundry's token name-display setting and player permissions.
 - Opens the hovered Token's Actor Sheet with `Ctrl+S` when the current user has at least Observer permission for that Actor.
+- Opens the hovered Actor's artwork locally with `Ctrl+1` when the current user has permission to view the Actor.
+- Allows a GM to show the hovered Actor's artwork to all connected players with `Ctrl+2`.
 - Shows the currently visible main-canvas area as a translucent white frame.
 - Clicking the map centers the main canvas on the selected location without resizing the minimap.
 - Redraws after Scene changes, canvas panning, zooming, token changes, visibility updates, and Fog of War updates.
@@ -60,6 +62,8 @@ Use one of the following controls to toggle the minimap:
 - Press `Ctrl+M`.
 - Click anywhere inside the map to center the main canvas on that point.
 - Hover over a token marker and press `Ctrl+S` to open its Actor Sheet, if you have permission to view that Actor.
+- Hover over a token marker and press `Ctrl+1` to open the Actor's artwork locally, if you have permission to view that Actor.
+- A GM can press `Ctrl+2` to open and share the Actor's artwork with all connected players.
 
 Panning the main canvas changes only the viewport frame. It does not change the minimap size or scale.
 
@@ -133,11 +137,13 @@ mel-minimap/
 │   └── zh.json
 ├── scripts/minimap.js
 ├── scripts/actor-sheet.mjs
+├── tests/
+│   └── actor-sheet.test.mjs
 └── styles/minimap.css
 ```
 
-The module uses Foundry VTT's `ApplicationV2`, Hooks, Scene Controls, the Canvas API, and a dedicated HTML canvas. It does not modify the active Scene document or add a second PIXI layer to the main canvas. Actor Sheet access uses Foundry's document permission API and the registered document sheet.
+The module uses Foundry VTT's `ApplicationV2`, Hooks, Scene Controls, the Canvas API, and a dedicated HTML canvas. It does not modify the active Scene document or add a second PIXI layer to the main canvas. Actor Sheet and artwork access use Foundry's document permission API, registered document sheets, and the native `ImagePopout` application.
 
 ## Validation
 
-The module is checked for JavaScript syntax, valid JSON manifests and language files, complete localization keys, Actor Sheet permission and hotkey behavior, and the expected Foundry-isolated module load. Run the unit tests with `node --test tests/actor-sheet.test.mjs`.
+The module is checked for JavaScript syntax, valid JSON manifests and language files, complete localization keys, Actor Sheet and artwork permission/hotkey behavior, and the expected Foundry-isolated module load. Run the unit tests with `node --test tests/actor-sheet.test.mjs`.
