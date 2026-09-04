@@ -4,7 +4,7 @@ Mel-Minimap is a Foundry Virtual Tabletop module that displays the complete acti
 
 ## Compatibility
 
-- Module version: `1.0.5`
+- Module version: `1.0.6`
 - Foundry Virtual Tabletop: `14.x`
 - Verified with Foundry Virtual Tabletop `14.367`
 
@@ -119,47 +119,15 @@ The Fog of War mask is sampled across the map for performance. Lighting, weather
 
 ## Localization
 
-Mel-Minimap includes 37 localization files. This includes the supported European Union languages and additional Foundry or community language codes.
+Mel-Minimap supports the following five languages:
 
 | Code | Language | File |
 |---|---|---|
-| ar | العربية | `lang/ar.json` |
-| bg | Български | `lang/bg.json` |
-| ca | Català | `lang/ca.json` |
-| ceb | Cebuano | `lang/ceb.json` |
-| cs | Čeština | `lang/cs.json` |
-| da | Dansk | `lang/da.json` |
 | de | Deutsch | `lang/de.json` |
-| el | Ελληνικά | `lang/el.json` |
 | en | English | `lang/en.json` |
 | es | Español | `lang/es.json` |
-| et | Eesti | `lang/et.json` |
-| eu | Euskara | `lang/eu.json` |
-| fi | Suomi | `lang/fi.json` |
 | fr | Français | `lang/fr.json` |
-| ga | Gaeilge | `lang/ga.json` |
-| gl | Galego | `lang/gl.json` |
-| hi | हिन्दी | `lang/hi.json` |
-| hr | Hrvatski | `lang/hr.json` |
-| hu | Magyar | `lang/hu.json` |
-| it | Italiano | `lang/it.json` |
-| ja | 日本語 | `lang/ja.json` |
-| ko | 한국어 | `lang/ko.json` |
-| lt | Lietuvių | `lang/lt.json` |
-| lv | Latviešu | `lang/lv.json` |
-| mt | Malti | `lang/mt.json` |
 | nl | Nederlands | `lang/nl.json` |
-| pl | Polski | `lang/pl.json` |
-| pt | Português | `lang/pt.json` |
-| ro | Română | `lang/ro.json` |
-| ru | Русский | `lang/ru.json` |
-| sk | Slovenčina | `lang/sk.json` |
-| sl | Slovenščina | `lang/sl.json` |
-| sv | Svenska | `lang/sv.json` |
-| th | ไทย | `lang/th.json` |
-| tr | Türkçe | `lang/tr.json` |
-| uk | Українська | `lang/uk.json` |
-| zh | 中文 | `lang/zh.json` |
 
 The main localization keys include:
 
