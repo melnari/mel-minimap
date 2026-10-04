@@ -4,8 +4,8 @@
   "description": "Mel-Minimap is a Foundry Virtual Tabletop module that displays the complete active Scene in a compact overview window. The minimap preserves the original map aspect ratio, shows relevant Tokens and Map Notes, and marks the portion of the Scene currently visible on the main canvas.",
   "url": "https://github.com/melnari/mel-minimap",
   "manifest": "https://raw.githubusercontent.com/melnari/mel-minimap/main/module.json",
-  "download": "https://github.com/melnari/mel-minimap/releases/download/v1.0.6/mel-minimap.zip",
-  "version": "1.0.6",
+  "download": "https://github.com/melnari/mel-minimap/releases/download/v1.0.7/mel-minimap.zip",
+  "version": "1.0.7",
   "type": "module",
   "authors": [
     {
@@ -18,7 +18,7 @@
   ],
   "compatibility": {
     "minimum": "14",
-    "verified": "14.367"
+    "verified": "14.368"
   },
   "media": [],
   "esmodules": [
