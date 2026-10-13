@@ -15,5 +15,6 @@
   "MEL_MINIMAP.Keybindings.ViewArtwork.Name": "Actor-Artwork anzeigen",
   "MEL_MINIMAP.Keybindings.ViewArtwork.Hint": "Öffnet das Artwork des Tokens unter dem Mauszeiger in einem lokalen Fenster.",
   "MEL_MINIMAP.Keybindings.ShareArtwork.Name": "Actor-Artwork teilen",
-  "MEL_MINIMAP.Keybindings.ShareArtwork.Hint": "Zeigt das Artwork des Tokens unter dem Mauszeiger allen Spielern an. Nur für den GM."
+  "MEL_MINIMAP.Keybindings.ShareArtwork.Hint": "Zeigt das Artwork des Tokens unter dem Mauszeiger allen Spielern an. Nur für den GM.",
+  "MEL_MINIMAP.TokenArtwork": "Token-Artwork"
 }

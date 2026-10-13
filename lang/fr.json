@@ -15,5 +15,6 @@
   "MEL_MINIMAP.Keybindings.ViewArtwork.Name": "Afficher l’illustration de l’acteur",
   "MEL_MINIMAP.Keybindings.ViewArtwork.Hint": "Ouvre localement l’illustration du token survolé.",
   "MEL_MINIMAP.Keybindings.ShareArtwork.Name": "Partager l’illustration de l’acteur",
-  "MEL_MINIMAP.Keybindings.ShareArtwork.Hint": "Affiche l’illustration du token survolé à tous les joueurs. MJ uniquement."
+  "MEL_MINIMAP.Keybindings.ShareArtwork.Hint": "Affiche l’illustration du token survolé à tous les joueurs. MJ uniquement.",
+  "MEL_MINIMAP.TokenArtwork": "Illustration du token"
 }

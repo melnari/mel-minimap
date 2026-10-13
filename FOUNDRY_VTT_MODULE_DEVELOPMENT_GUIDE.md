@@ -9,7 +9,7 @@ It intentionally contains no feature decisions for a specific module. Replace th
 - `<repository-name>`: the repository name
 - `<system-id>`: an optional system identifier
 
-The examples target the Foundry VTT 14 API family. Always verify the exact target build and current API documentation before release.
+The examples target the Foundry VTT 14 API family and use `14.369` as the current verified-build example. Always verify the exact target build and current API documentation before release.
 
 ## 1. Foundry package fundamentals
 
@@ -100,7 +100,7 @@ Replace every placeholder and remove fields that do not apply:
   "version": "1.0.0",
   "compatibility": {
     "minimum": "14",
-    "verified": "14.367"
+    "verified": "14.369"
   },
   "authors": [
     {
@@ -247,7 +247,7 @@ Common placeables include Tokens and Actors, Notes and Journal Entries, Tiles, D
 
 For each placeable, define its source document, scene ownership, user visibility, coordinate origin, dimensions, refresh hooks, and missing-asset behavior.
 
-For generic Map Notes, do not assume one data shape across all versions. In Foundry VTT 14, note data can include fields such as `entryId`, `pageId`, `iconSize`, `texture`, `x`, and `y), while the placeable can resolve its Journal Entry or page. Use current document and placeable APIs, and test notes with and without a page reference.
+For generic Map Notes, do not assume one data shape across all versions. In Foundry VTT 14, note data can include fields such as `entryId`, `pageId`, `iconSize`, `texture`, `x`, and `y`, while the placeable can resolve its Journal Entry or page. Use current document and placeable APIs, and test notes with and without a page reference.
 
 ## 10. Permissions, visibility, and safety
 

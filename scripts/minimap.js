@@ -1,7 +1,8 @@
 import {
   canShareActorArtwork,
+  canViewActorArtwork,
+  canViewTokenArtwork,
   canViewActorSheet,
-  getActorArtwork,
   openActorArtworkForToken,
   openActorSheetForToken,
   shareActorArtworkForToken
@@ -584,7 +585,9 @@ class MelMinimap extends ApplicationV2 {
     const artworkAction = action === "shareArtwork" ? "share" : "view";
     const allowed = artworkAction === "share"
       ? canShareActorArtwork(token)
-      : Boolean(canViewActorSheet(token?.actor) && getActorArtwork(token?.actor, token));
+      : game.user?.isGM
+        ? canViewActorArtwork(token)
+        : canViewTokenArtwork(token);
     if (!allowed) return false;
 
     event?.preventDefault?.();

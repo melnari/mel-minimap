@@ -15,5 +15,6 @@
   "MEL_MINIMAP.Keybindings.ViewArtwork.Name": "Ver ilustración del Actor",
   "MEL_MINIMAP.Keybindings.ViewArtwork.Hint": "Abre en una ventana local la ilustración del Token bajo el cursor.",
   "MEL_MINIMAP.Keybindings.ShareArtwork.Name": "Compartir ilustración del Actor",
-  "MEL_MINIMAP.Keybindings.ShareArtwork.Hint": "Muestra la ilustración del Token bajo el cursor a todos los jugadores. Solo para el DJ."
+  "MEL_MINIMAP.Keybindings.ShareArtwork.Hint": "Muestra la ilustración del Token bajo el cursor a todos los jugadores. Solo para el DJ.",
+  "MEL_MINIMAP.TokenArtwork": "Ilustración del token"
 }

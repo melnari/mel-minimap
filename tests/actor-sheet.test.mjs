@@ -2,8 +2,11 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   canShareActorArtwork,
+  canViewActorArtwork,
   canViewActorSheet,
+  canViewTokenArtwork,
   getActorArtwork,
+  getTokenArtwork,
   openActorArtworkForToken,
   openActorSheetForToken,
   shareActorArtworkForToken
@@ -42,7 +45,7 @@ test("Users without Observer permission cannot open the Actor Sheet", () => {
   assert.equal(rendered, false);
 });
 
-function makeArtworkToken({ permitted = true, gm = false } = {}) {
+function makeArtworkToken({ permitted = true, gm = false, visible = true, hidden = false } = {}) {
   const calls = [];
   const actor = {
     name: "Ranger",
@@ -51,12 +54,17 @@ function makeArtworkToken({ permitted = true, gm = false } = {}) {
     sheet: { render: options => calls.push({ type: "sheet", options }) },
     testUserPermission: () => permitted
   };
-  const token = { name: "Ranger Token", actor, document: { texture: { src: "artwork/token.webp" } } };
+  const token = {
+    name: "Ranger Token",
+    visible,
+    actor,
+    document: { hidden, texture: { src: "artwork/token.webp" } }
+  };
   const user = { id: gm ? "gm" : "player", isGM: gm };
   return { calls, actor, token, user };
 }
 
-test("Ctrl+1 opens the Actor artwork in a native ImagePopout", async () => {
+test("Ctrl+1 opens visible Token artwork without Actor permission", async () => {
   const { token, user } = makeArtworkToken();
   const popouts = [];
   class FakeImagePopout {
@@ -71,20 +79,22 @@ test("Ctrl+1 opens the Actor artwork in a native ImagePopout", async () => {
     }
   }
 
-  assert.equal(getActorArtwork(token.actor, token), "artwork/ranger.webp");
+  assert.equal(getTokenArtwork(token), "artwork/token.webp");
+  assert.equal(canViewTokenArtwork(token, user), true);
   assert.equal(await openActorArtworkForToken(token, user, constants, FakeImagePopout), true);
   assert.deepEqual(popouts[0].options, {
-    src: "artwork/ranger.webp",
-    uuid: "Actor.ranger",
-    window: { title: "Ranger" }
+    src: "artwork/token.webp",
+    window: { title: "Token Artwork" }
   });
   assert.deepEqual(popouts[0].renderCalls, [{ force: true }]);
 });
 
-test("Ctrl+2 shares artwork only for a permitted GM", async () => {
+test("Ctrl+2 preserves the GM Actor artwork behavior", async () => {
   const { token, user } = makeArtworkToken({ gm: true });
   let shared = 0;
+  const popouts = [];
   class FakeImagePopout {
+    constructor(options) { popouts.push(options); }
     async render() {}
     shareImage() { shared += 1; }
   }
@@ -92,6 +102,11 @@ test("Ctrl+2 shares artwork only for a permitted GM", async () => {
   assert.equal(canShareActorArtwork(token, user, constants), true);
   assert.equal(await shareActorArtworkForToken(token, user, constants, FakeImagePopout), true);
   assert.equal(shared, 1);
+  assert.deepEqual(popouts, [{
+    src: "artwork/ranger.webp",
+    uuid: "Actor.ranger",
+    window: { title: "Ranger" }
+  }]);
 
   const player = makeArtworkToken().user;
   assert.equal(canShareActorArtwork(token, player, constants), false);
@@ -99,8 +114,9 @@ test("Ctrl+2 shares artwork only for a permitted GM", async () => {
   assert.equal(shared, 1);
 });
 
-test("Artwork access is denied without Actor permission", async () => {
+test("Token artwork access is denied when the Token is not visible", async () => {
   const { token, user } = makeArtworkToken({ permitted: false });
+  token.visible = false;
   let constructed = false;
   class FakeImagePopout {
     constructor() { constructed = true; }
@@ -108,6 +124,25 @@ test("Artwork access is denied without Actor permission", async () => {
 
   assert.equal(await openActorArtworkForToken(token, user, constants, FakeImagePopout), false);
   assert.equal(constructed, false);
+});
+
+test("GM Actor artwork behavior remains available for hidden Tokens", async () => {
+  const { token, user } = makeArtworkToken({ gm: true, hidden: true });
+  assert.equal(canViewTokenArtwork(token, user), false);
+  assert.equal(canViewActorArtwork(token, user, constants), true);
+
+  const popouts = [];
+  class FakeImagePopout {
+    constructor(options) { popouts.push(options); }
+    async render() {}
+  }
+
+  assert.equal(await openActorArtworkForToken(token, user, constants, FakeImagePopout), true);
+  assert.deepEqual(popouts[0], {
+    src: "artwork/ranger.webp",
+    uuid: "Actor.ranger",
+    window: { title: "Ranger" }
+  });
 });
 
 test("Missing Actors or Sheets are handled without throwing", () => {

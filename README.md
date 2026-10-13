@@ -4,9 +4,9 @@ Mel-Minimap is a Foundry Virtual Tabletop module that displays the complete acti
 
 ## Compatibility
 
-- Module version: `1.0.7`
+- Module version: `1.0.8`
 - Foundry Virtual Tabletop: `14.x`
-- Verified with Foundry Virtual Tabletop `14.368`
+- Verified with Foundry Virtual Tabletop `14.369`
 
 ## Features
 
@@ -43,8 +43,10 @@ When the pointer hovers over a Map Note, its custom Note text or linked Journal 
 ### Actor Sheets and artwork
 
 - `Ctrl+S` opens the Actor Sheet for a hovered Token when the current user has at least Observer permission for that Actor.
-- `Ctrl+1` opens the hovered Actor's artwork locally when the current user may view that Actor.
-- `Ctrl+2` allows a GM to open and share the hovered Actor's artwork with all connected players.
+- `Ctrl+1` opens a player's hovered visible Token texture locally; Actor permission and Token name visibility are not required.
+- For the GM, `Ctrl+1` retains the original Actor-artwork behavior, including the Actor artwork and Actor title.
+- `Ctrl+2` retains the original GM-only Actor-artwork sharing behavior.
+- Player artwork windows use the neutral localized title **Token Artwork** and do not expose the Actor or Token name in the window title.
 
 ## Installation
 
@@ -100,12 +102,12 @@ All Mel-Minimap keybindings are registered with Foundry and can be changed in **
 | Shortcut | Hovered Token | Hovered Map Note |
 |---|---|---|
 | `Ctrl+S` | Opens the Actor Sheet when permitted | Opens the linked Journal Entry or Journal Entry Page when permitted |
-| `Ctrl+1` | Opens the Actor's artwork locally when permitted | No action |
-| `Ctrl+2` | A GM shares the Actor's artwork with all connected players | No action |
+| `Ctrl+1` | Opens the visible Token texture locally; GM uses Actor artwork | No action |
+| `Ctrl+2` | A GM shares the Actor artwork with all connected players | No action |
 
 The shortcut only applies while the pointer is over the minimap. If the current user does not have the required permission, the shortcut is ignored.
 
-The artwork shortcuts also support `Ctrl+Num1` and `Ctrl+Num2` by default. All default bindings can be reassigned in Foundry's Controls configuration.
+The artwork shortcuts also support `Ctrl+Num1` and `Ctrl+Num2` by default. For players, `Ctrl+1` requires a visible, non-hidden Token with configured Token artwork, but does not require Actor ownership or a displayed Token name. The GM retains the original Actor-artwork behavior. All default bindings can be reassigned in Foundry's Controls configuration.
 
 ## Visibility and Fog of War
 
@@ -179,3 +181,7 @@ The validation suite covers Actor Sheet and artwork permissions, keyboard shortc
 ## License
 
 See [LICENSE](LICENSE).
+
+## AI Usage Declaration
+
+Parts of this module were created with AI assistance. The maintainer reviews, tests, maintains, develops, and supports the code and is responsible for its quality, compatibility and continued development.

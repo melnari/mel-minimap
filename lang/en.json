@@ -15,5 +15,6 @@
   "MEL_MINIMAP.Keybindings.ViewArtwork.Name": "View Actor Artwork",
   "MEL_MINIMAP.Keybindings.ViewArtwork.Hint": "Opens the hovered Token's artwork in a local window.",
   "MEL_MINIMAP.Keybindings.ShareArtwork.Name": "Share Actor Artwork",
-  "MEL_MINIMAP.Keybindings.ShareArtwork.Hint": "Shows the hovered Token's artwork to all players. GM only."
+  "MEL_MINIMAP.Keybindings.ShareArtwork.Hint": "Shows the hovered Token's artwork to all players. GM only.",
+  "MEL_MINIMAP.TokenArtwork": "Token Artwork"
 }

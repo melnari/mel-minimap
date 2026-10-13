@@ -17,19 +17,62 @@ export function canViewActorSheet(actor, user = globalThis.game?.user, constants
   return Boolean(user.isGM || actor.isOwner);
 }
 
-export function getActorArtwork(actor, token = null) {
-  return actor?.img || token?.document?.texture?.src || token?.texture?.src || null;
+/** Return only the artwork configured on the visible Token. */
+export function getTokenArtwork(token) {
+  return token?.document?.texture?.src || token?.texture?.src || null;
 }
 
-export function canShareActorArtwork(token, user = globalThis.game?.user, constants = globalThis.CONST) {
+/** Return the legacy Actor artwork used by GM-only artwork actions. */
+export function getActorArtwork(actor, token = null) {
+  return actor?.img || getTokenArtwork(token);
+}
+
+/**
+ * A Token's visible texture can be viewed without Actor ownership. The
+ * caller still has to obtain the Token through the normal visible hover path.
+ */
+export function canViewTokenArtwork(token, user = globalThis.game?.user) {
+  if (!token || !user) return false;
+  if (token.visible === false || token.document?.hidden) return false;
+  return Boolean(getTokenArtwork(token));
+}
+
+/** Return whether a user may use the legacy Actor artwork path. */
+export function canViewActorArtwork(token, user = globalThis.game?.user, constants = globalThis.CONST) {
   return Boolean(
-    user?.isGM &&
     canViewActorSheet(token?.actor, user, constants) &&
     getActorArtwork(token?.actor, token)
   );
 }
 
-function createActorArtworkPopout(token, ImagePopoutClass = globalThis.foundry?.applications?.apps?.ImagePopout) {
+export function canShareActorArtwork(token, user = globalThis.game?.user, constants = globalThis.CONST) {
+  return Boolean(
+    user?.isGM &&
+    canViewActorArtwork(token, user, constants)
+  );
+}
+
+function getNeutralArtworkTitle() {
+  const key = "MEL_MINIMAP.TokenArtwork";
+  const localized = globalThis.game?.i18n?.localize?.(key);
+  return localized && localized !== key ? localized : "Token Artwork";
+}
+
+function createTokenArtworkPopout(token, ImagePopoutClass = globalThis.foundry?.applications?.apps?.ImagePopout) {
+  const source = getTokenArtwork(token);
+  if (!source || typeof ImagePopoutClass !== "function") return null;
+
+  const options = {
+    src: source,
+    window: { title: getNeutralArtworkTitle() }
+  };
+  return new ImagePopoutClass(options);
+}
+
+function createActorArtworkPopout(
+  token,
+  ImagePopoutClass = globalThis.foundry?.applications?.apps?.ImagePopout
+) {
   const actor = token?.actor;
   const source = getActorArtwork(actor, token);
   if (!actor || !source || typeof ImagePopoutClass !== "function") return null;
@@ -42,22 +85,29 @@ function createActorArtworkPopout(token, ImagePopoutClass = globalThis.foundry?.
   return new ImagePopoutClass(options);
 }
 
-/** Open a hovered Token Actor's artwork in a local native ImagePopout. */
+/** Open a visible Token's configured artwork in a local native ImagePopout. */
 export async function openActorArtworkForToken(
   token,
   user = globalThis.game?.user,
   constants = globalThis.CONST,
   ImagePopoutClass = globalThis.foundry?.applications?.apps?.ImagePopout
 ) {
-  if (!canViewActorSheet(token?.actor, user, constants)) return false;
-  const popout = createActorArtworkPopout(token, ImagePopoutClass);
+  const isGM = Boolean(user?.isGM);
+  const permitted = isGM
+    ? canViewActorArtwork(token, user, constants)
+    : canViewTokenArtwork(token, user);
+  if (!permitted) return false;
+
+  const popout = isGM
+    ? createActorArtworkPopout(token, ImagePopoutClass)
+    : createTokenArtworkPopout(token, ImagePopoutClass);
   if (!popout) return false;
 
   await popout.render({ force: true });
   return true;
 }
 
-/** Open and share a hovered Token Actor's artwork with all connected Users. */
+/** Open and share a visible Token's configured artwork with all connected Users. */
 export async function shareActorArtworkForToken(
   token,
   user = globalThis.game?.user,

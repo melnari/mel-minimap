@@ -15,5 +15,6 @@
   "MEL_MINIMAP.Keybindings.ViewArtwork.Name": "Actorillustratie bekijken",
   "MEL_MINIMAP.Keybindings.ViewArtwork.Hint": "Opent de illustratie van de zwevende Token in een lokaal venster.",
   "MEL_MINIMAP.Keybindings.ShareArtwork.Name": "Actorillustratie delen",
-  "MEL_MINIMAP.Keybindings.ShareArtwork.Hint": "Toont de illustratie van de zwevende Token aan alle spelers. Alleen voor de GM."
+  "MEL_MINIMAP.Keybindings.ShareArtwork.Hint": "Toont de illustratie van de zwevende Token aan alle spelers. Alleen voor de GM.",
+  "MEL_MINIMAP.TokenArtwork": "Tokenillustratie"
 }
