@@ -4,8 +4,6 @@ import {
   canShareActorArtwork,
   canViewActorSheet,
   getActorArtwork,
-  getActorArtworkShortcut,
-  isActorSheetShortcut,
   openActorArtworkForToken,
   openActorSheetForToken,
   shareActorArtworkForToken
@@ -14,22 +12,6 @@ import {
 const constants = {
   DOCUMENT_OWNERSHIP_LEVELS: { OBSERVER: 2 }
 };
-
-test("Ctrl+S is recognized only as a non-repeated control shortcut", () => {
-  assert.equal(isActorSheetShortcut({ ctrlKey: true, code: "KeyS", repeat: false }), true);
-  assert.equal(isActorSheetShortcut({ ctrlKey: false, code: "KeyS", repeat: false }), false);
-  assert.equal(isActorSheetShortcut({ ctrlKey: true, code: "KeyA", repeat: false }), false);
-  assert.equal(isActorSheetShortcut({ ctrlKey: true, code: "KeyB", repeat: false }), false);
-  assert.equal(isActorSheetShortcut({ ctrlKey: true, code: "KeyS", repeat: true }), false);
-});
-
-test("Ctrl+1 and Ctrl+2 select local view and GM share actions", () => {
-  assert.equal(getActorArtworkShortcut({ ctrlKey: true, code: "Digit1", repeat: false }), "view");
-  assert.equal(getActorArtworkShortcut({ ctrlKey: true, code: "Numpad2", repeat: false }), "share");
-  assert.equal(getActorArtworkShortcut({ ctrlKey: false, code: "Digit1", repeat: false }), null);
-  assert.equal(getActorArtworkShortcut({ ctrlKey: true, code: "KeyA", repeat: false }), null);
-  assert.equal(getActorArtworkShortcut({ ctrlKey: true, code: "Digit1", repeat: true }), null);
-});
 
 test("Observer permission allows the hovered Actor Sheet to open", () => {
   const user = { id: "player" };

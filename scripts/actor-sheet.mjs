@@ -17,17 +17,6 @@ export function canViewActorSheet(actor, user = globalThis.game?.user, constants
   return Boolean(user.isGM || actor.isOwner);
 }
 
-export function isActorSheetShortcut(event) {
-  return Boolean(event?.ctrlKey && event.code === "KeyS" && !event.repeat);
-}
-
-export function getActorArtworkShortcut(event) {
-  if (!event?.ctrlKey || event.repeat) return null;
-  if (event.code === "Digit1" || event.code === "Numpad1") return "view";
-  if (event.code === "Digit2" || event.code === "Numpad2") return "share";
-  return null;
-}
-
 export function getActorArtwork(actor, token = null) {
   return actor?.img || token?.document?.texture?.src || token?.texture?.src || null;
 }

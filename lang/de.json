@@ -9,5 +9,11 @@
   "MEL_MINIMAP.Legend.Party": "Verbündet",
   "MEL_MINIMAP.Legend.Neutral": "Neutral",
   "MEL_MINIMAP.Legend.Opposition": "Gegner",
-  "MEL_MINIMAP.Legend.Self": "Ich"
+  "MEL_MINIMAP.Legend.Self": "Ich",
+  "MEL_MINIMAP.Keybindings.ActorSheet.Name": "Actor Sheet oder Journal öffnen",
+  "MEL_MINIMAP.Keybindings.ActorSheet.Hint": "Öffnet das Actor Sheet eines Tokens oder den verknüpften Journal-Eintrag einer Map Note.",
+  "MEL_MINIMAP.Keybindings.ViewArtwork.Name": "Actor-Artwork anzeigen",
+  "MEL_MINIMAP.Keybindings.ViewArtwork.Hint": "Öffnet das Artwork des Tokens unter dem Mauszeiger in einem lokalen Fenster.",
+  "MEL_MINIMAP.Keybindings.ShareArtwork.Name": "Actor-Artwork teilen",
+  "MEL_MINIMAP.Keybindings.ShareArtwork.Hint": "Zeigt das Artwork des Tokens unter dem Mauszeiger allen Spielern an. Nur für den GM."
 }

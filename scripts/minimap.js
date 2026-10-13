@@ -2,8 +2,6 @@ import {
   canShareActorArtwork,
   canViewActorSheet,
   getActorArtwork,
-  getActorArtworkShortcut,
-  isActorSheetShortcut,
   openActorArtworkForToken,
   openActorSheetForToken,
   shareActorArtworkForToken
@@ -14,6 +12,7 @@ import {
   getMapNoteText,
   openMapNoteJournal
 } from "./map-note.mjs";
+import { getKeybindingDefaults } from "./keybindings.mjs";
 
 const MODULE_ID = "mel-minimap";
 const MINIMAP_ID = `${MODULE_ID}-window`;
@@ -63,8 +62,6 @@ class MelMinimap extends ApplicationV2 {
   #hoveredToken = null;
   #hoveredNote = null;
   #pointerPosition = null;
-  #keyListenerAttached = false;
-  #handleKeyDown = event => this.#handleKeyboardShortcut(event);
 
   constructor(options = {}) {
     super(options);
@@ -124,7 +121,6 @@ class MelMinimap extends ApplicationV2 {
   }
 
   async _onRender() {
-    this.#attachKeyListener();
     this.#startRefreshLoop();
     const map = this.#getMapBounds(globalThis.canvas?.dimensions, globalThis.canvas?.scene);
     if (map) this.#fitWindowToMap(map);
@@ -133,7 +129,6 @@ class MelMinimap extends ApplicationV2 {
 
   async _onClose() {
     this.#stopRefreshLoop();
-    this.#detachKeyListener();
     this.#clearTokenHover();
     MelMinimap._instances.delete(this);
   }
@@ -562,42 +557,37 @@ class MelMinimap extends ApplicationV2 {
     this.#setTokenInfo(null);
   }
 
-  #attachKeyListener() {
-    if (this.#keyListenerAttached) return;
-    window.addEventListener("keydown", this.#handleKeyDown);
-    this.#keyListenerAttached = true;
+  /** Dispatch an editable Foundry keybinding to the hovered minimap. */
+  static handleKeybinding(action, context = {}) {
+    for (const minimap of MelMinimap._instances) {
+      if (minimap.#handleKeybinding(action, context)) return true;
+    }
+    return false;
   }
 
-  #detachKeyListener() {
-    if (!this.#keyListenerAttached) return;
-    window.removeEventListener("keydown", this.#handleKeyDown);
-    this.#keyListenerAttached = false;
-  }
+  #handleKeybinding(action, context = {}) {
+    if (typeof this.#mapCanvas?.matches === "function" && !this.#mapCanvas.matches(":hover")) return false;
 
-  #handleKeyboardShortcut(event) {
-    if (typeof this.#mapCanvas?.matches === "function" && !this.#mapCanvas.matches(":hover")) return;
-
-    if (isActorSheetShortcut(event)) {
+    const event = context?.event ?? context;
+    if (action === "actorSheet") {
       const opened = this.#hoveredNote
         ? openMapNoteJournal(this.#hoveredNote)
         : openActorSheetForToken(this.#hoveredToken);
-      if (!opened) return;
-      event.preventDefault();
-      event.stopPropagation();
-      return;
+      if (!opened) return false;
+      event?.preventDefault?.();
+      return true;
     }
 
-    const artworkAction = getActorArtworkShortcut(event);
-    if (!artworkAction) return;
+    if (action !== "viewArtwork" && action !== "shareArtwork") return false;
 
     const token = this.#hoveredToken;
+    const artworkAction = action === "shareArtwork" ? "share" : "view";
     const allowed = artworkAction === "share"
       ? canShareActorArtwork(token)
       : Boolean(canViewActorSheet(token?.actor) && getActorArtwork(token?.actor, token));
-    if (!allowed) return;
+    if (!allowed) return false;
 
-    event.preventDefault();
-    event.stopPropagation();
+    event?.preventDefault?.();
 
     const operation = artworkAction === "share"
       ? shareActorArtworkForToken(token)
@@ -605,6 +595,7 @@ class MelMinimap extends ApplicationV2 {
     void operation.catch(error => {
       console.error(`${MODULE_ID} could not open Actor artwork`, error);
     });
+    return true;
   }
 
   #updateHoveredTarget(tokenMarkers, noteMarkers, map) {
@@ -889,12 +880,39 @@ Hooks.once("init", () => {
 
   game.keybindings.register(MODULE_ID, "toggleMinimap", {
     name: "MEL_MINIMAP.Toggle",
-    editable: [{ key: "KeyM", modifiers: ["Control"] }],
+    editable: getKeybindingDefaults("toggleMinimap"),
     restricted: false,
     onDown: () => {
       toggleMinimap();
       return true;
     }
+  });
+
+  game.keybindings.register(MODULE_ID, "actorSheet", {
+    name: "MEL_MINIMAP.Keybindings.ActorSheet.Name",
+    hint: "MEL_MINIMAP.Keybindings.ActorSheet.Hint",
+    editable: getKeybindingDefaults("actorSheet"),
+    repeat: false,
+    restricted: false,
+    onDown: context => MelMinimap.handleKeybinding("actorSheet", context)
+  });
+
+  game.keybindings.register(MODULE_ID, "viewArtwork", {
+    name: "MEL_MINIMAP.Keybindings.ViewArtwork.Name",
+    hint: "MEL_MINIMAP.Keybindings.ViewArtwork.Hint",
+    editable: getKeybindingDefaults("viewArtwork"),
+    repeat: false,
+    restricted: false,
+    onDown: context => MelMinimap.handleKeybinding("viewArtwork", context)
+  });
+
+  game.keybindings.register(MODULE_ID, "shareArtwork", {
+    name: "MEL_MINIMAP.Keybindings.ShareArtwork.Name",
+    hint: "MEL_MINIMAP.Keybindings.ShareArtwork.Hint",
+    editable: getKeybindingDefaults("shareArtwork"),
+    repeat: false,
+    restricted: false,
+    onDown: context => MelMinimap.handleKeybinding("shareArtwork", context)
   });
 });
 

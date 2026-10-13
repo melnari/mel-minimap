@@ -9,5 +9,11 @@
   "MEL_MINIMAP.Legend.Party": "Groupe",
   "MEL_MINIMAP.Legend.Neutral": "Neutres",
   "MEL_MINIMAP.Legend.Opposition": "Opposition",
-  "MEL_MINIMAP.Legend.Self": "Moi"
+  "MEL_MINIMAP.Legend.Self": "Moi",
+  "MEL_MINIMAP.Keybindings.ActorSheet.Name": "Ouvrir l’acteur ou le journal",
+  "MEL_MINIMAP.Keybindings.ActorSheet.Hint": "Ouvre la fiche de l’acteur survolé ou le journal lié à une note survolée.",
+  "MEL_MINIMAP.Keybindings.ViewArtwork.Name": "Afficher l’illustration de l’acteur",
+  "MEL_MINIMAP.Keybindings.ViewArtwork.Hint": "Ouvre localement l’illustration du token survolé.",
+  "MEL_MINIMAP.Keybindings.ShareArtwork.Name": "Partager l’illustration de l’acteur",
+  "MEL_MINIMAP.Keybindings.ShareArtwork.Hint": "Affiche l’illustration du token survolé à tous les joueurs. MJ uniquement."
 }

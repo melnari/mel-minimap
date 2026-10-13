@@ -9,5 +9,11 @@
   "MEL_MINIMAP.Legend.Party": "Grupo",
   "MEL_MINIMAP.Legend.Neutral": "Neutral",
   "MEL_MINIMAP.Legend.Opposition": "Oposición",
-  "MEL_MINIMAP.Legend.Self": "Yo"
+  "MEL_MINIMAP.Legend.Self": "Yo",
+  "MEL_MINIMAP.Keybindings.ActorSheet.Name": "Abrir Actor o diario",
+  "MEL_MINIMAP.Keybindings.ActorSheet.Hint": "Abre el Actor del Token o el diario vinculado a una nota del mapa bajo el cursor.",
+  "MEL_MINIMAP.Keybindings.ViewArtwork.Name": "Ver ilustración del Actor",
+  "MEL_MINIMAP.Keybindings.ViewArtwork.Hint": "Abre en una ventana local la ilustración del Token bajo el cursor.",
+  "MEL_MINIMAP.Keybindings.ShareArtwork.Name": "Compartir ilustración del Actor",
+  "MEL_MINIMAP.Keybindings.ShareArtwork.Hint": "Muestra la ilustración del Token bajo el cursor a todos los jugadores. Solo para el DJ."
 }

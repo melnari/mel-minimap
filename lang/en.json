@@ -9,5 +9,11 @@
   "MEL_MINIMAP.Legend.Party": "Party",
   "MEL_MINIMAP.Legend.Neutral": "Neutral",
   "MEL_MINIMAP.Legend.Opposition": "Opposition",
-  "MEL_MINIMAP.Legend.Self": "Self"
+  "MEL_MINIMAP.Legend.Self": "Self",
+  "MEL_MINIMAP.Keybindings.ActorSheet.Name": "Open Actor Sheet or Journal",
+  "MEL_MINIMAP.Keybindings.ActorSheet.Hint": "Opens the hovered Token's Actor Sheet or a hovered Map Note's linked Journal Entry.",
+  "MEL_MINIMAP.Keybindings.ViewArtwork.Name": "View Actor Artwork",
+  "MEL_MINIMAP.Keybindings.ViewArtwork.Hint": "Opens the hovered Token's artwork in a local window.",
+  "MEL_MINIMAP.Keybindings.ShareArtwork.Name": "Share Actor Artwork",
+  "MEL_MINIMAP.Keybindings.ShareArtwork.Hint": "Shows the hovered Token's artwork to all players. GM only."
 }

@@ -95,6 +95,8 @@ Changing **Show Map Notes** updates open minimaps immediately.
 
 ### Keyboard shortcuts for hovered objects
 
+All Mel-Minimap keybindings are registered with Foundry and can be changed in **Configure Controls → Keybindings → Mel-Minimap**. The following assignments are the defaults:
+
 | Shortcut | Hovered Token | Hovered Map Note |
 |---|---|---|
 | `Ctrl+S` | Opens the Actor Sheet when permitted | Opens the linked Journal Entry or Journal Entry Page when permitted |
@@ -102,6 +104,8 @@ Changing **Show Map Notes** updates open minimaps immediately.
 | `Ctrl+2` | A GM shares the Actor's artwork with all connected players | No action |
 
 The shortcut only applies while the pointer is over the minimap. If the current user does not have the required permission, the shortcut is ignored.
+
+The artwork shortcuts also support `Ctrl+Num1` and `Ctrl+Num2` by default. All default bindings can be reassigned in Foundry's Controls configuration.
 
 ## Visibility and Fog of War
 
@@ -150,6 +154,7 @@ mel-minimap/
 ├── scripts/
 │   ├── minimap.js
 │   ├── actor-sheet.mjs
+│   ├── keybindings.mjs
 │   └── map-note.mjs
 ├── tests/
 │   ├── actor-sheet.test.mjs

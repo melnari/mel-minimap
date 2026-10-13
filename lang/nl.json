@@ -9,5 +9,11 @@
   "MEL_MINIMAP.Legend.Party": "Groep",
   "MEL_MINIMAP.Legend.Neutral": "Neutraal",
   "MEL_MINIMAP.Legend.Opposition": "Tegenstanders",
-  "MEL_MINIMAP.Legend.Self": "Ik"
+  "MEL_MINIMAP.Legend.Self": "Ik",
+  "MEL_MINIMAP.Keybindings.ActorSheet.Name": "Actor of journaal openen",
+  "MEL_MINIMAP.Keybindings.ActorSheet.Hint": "Opent het Actor-blad van de zwevende Token of het gekoppelde journaal van een kaartnotitie.",
+  "MEL_MINIMAP.Keybindings.ViewArtwork.Name": "Actorillustratie bekijken",
+  "MEL_MINIMAP.Keybindings.ViewArtwork.Hint": "Opent de illustratie van de zwevende Token in een lokaal venster.",
+  "MEL_MINIMAP.Keybindings.ShareArtwork.Name": "Actorillustratie delen",
+  "MEL_MINIMAP.Keybindings.ShareArtwork.Hint": "Toont de illustratie van de zwevende Token aan alle spelers. Alleen voor de GM."
 }
