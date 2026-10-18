@@ -39,11 +39,11 @@ The user's own Token is highlighted with a white marker and blue outline. Hoveri
 
 Map Notes use their configured Foundry icon and `iconSize`, scaled proportionally to the complete Scene. The feature is controlled by the client setting **Show Map Notes**, which is disabled by default.
 
-When the pointer hovers over a Map Note, its custom Note text or linked Journal title is shown in the top-left information area. Pressing `Ctrl+S` opens the linked Journal Entry and, when configured, its linked Journal Entry Page.
+When the pointer hovers over a Map Note, its custom Note text or linked Journal title is shown in the top-left information area. Pressing `V` opens the linked Journal Entry and, when configured, its linked Journal Entry Page.
 
 ### Actor Sheets and artwork
 
-- `Ctrl+S` opens the Actor Sheet for a hovered Token when the current user has at least Observer permission for that Actor.
+- `V` opens the Actor Sheet for a hovered Token when the current user has at least Observer permission for that Actor.
 - `Ctrl+1` opens a player's hovered visible Token texture locally; Actor permission and Token name visibility are not required.
 - For the GM, `Ctrl+1` retains the original Actor-artwork behavior, including the Actor artwork and Actor title.
 - `Ctrl+2` retains the original GM-only Actor-artwork sharing behavior.
@@ -102,7 +102,7 @@ All Mel-Minimap keybindings are registered with Foundry and can be changed in **
 
 | Shortcut | Hovered Token | Hovered Map Note |
 |---|---|---|
-| `Ctrl+S` | Opens the Actor Sheet when permitted | Opens the linked Journal Entry or Journal Entry Page when permitted |
+| `V` | Opens the Actor Sheet when permitted | Opens the linked Journal Entry or Journal Entry Page when permitted |
 | `Ctrl+1` | Opens the visible Token texture locally; GM uses Actor artwork | No action |
 | `Ctrl+2` | A GM shares the Actor artwork with all connected players | No action |
 

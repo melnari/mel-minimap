@@ -54,7 +54,7 @@ test("Map note hover text falls back to the linked Journal title", () => {
   assert.equal(getMapNoteText(note), "Harbor District");
 });
 
-test("Ctrl+S map note action opens the linked Journal page for an Observer", () => {
+test("V map note action opens the linked Journal page for an Observer", () => {
   const { calls, collection, note } = makeNote();
   const user = { id: "player" };
 

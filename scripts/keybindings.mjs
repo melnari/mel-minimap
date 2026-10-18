@@ -6,7 +6,7 @@
  */
 export const KEYBINDING_DEFAULTS = Object.freeze({
   toggleMinimap: Object.freeze([{ key: "KeyM", modifiers: ["Control"] }]),
-  actorSheet: Object.freeze([{ key: "KeyS", modifiers: ["Control"] }]),
+  actorSheet: Object.freeze([{ key: "KeyV", modifiers: [] }]),
   viewArtwork: Object.freeze([
     { key: "Digit1", modifiers: ["Control"] },
     { key: "Numpad1", modifiers: ["Control"] }

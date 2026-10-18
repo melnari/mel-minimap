@@ -5,7 +5,7 @@ import { KEYBINDING_DEFAULTS, getKeybindingDefaults } from "../scripts/keybindin
 test("all Mel-Minimap keybindings keep the current default assignments", () => {
   assert.deepEqual(KEYBINDING_DEFAULTS, {
     toggleMinimap: [{ key: "KeyM", modifiers: ["Control"] }],
-    actorSheet: [{ key: "KeyS", modifiers: ["Control"] }],
+    actorSheet: [{ key: "KeyV", modifiers: [] }],
     viewArtwork: [
       { key: "Digit1", modifiers: ["Control"] },
       { key: "Numpad1", modifiers: ["Control"] }
