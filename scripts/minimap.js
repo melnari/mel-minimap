@@ -51,6 +51,14 @@ class MelMinimap extends ApplicationV2 {
 
   static _instances = new Set();
 
+  /**
+   * Keep Mel-Minimap in the current Foundry window.
+   * Foundry uses this gate for the native ApplicationV2 Detach action.
+   */
+  _canDetach() {
+    return false;
+  }
+
   #content = null;
   #mapCanvas = null;
   #status = null;
