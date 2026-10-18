@@ -194,6 +194,20 @@ For an auto-fitting view:
 5. Center the result and letterbox unused space.
 6. Recalculate after source, container, or device-pixel-ratio changes.
 
+For an `ApplicationV2` window that must remain in the main Foundry workspace, use
+the application's supported detach permission hook instead of manipulating browser
+windows directly:
+
+```js
+_canDetach() {
+  return false;
+}
+```
+
+This disables the native Detach action for that application while leaving ordinary
+window movement and minimization available. Verify the behavior against the target
+Foundry version's `ApplicationV2` API.
+
 ## 8. Canvas, images, and coordinate systems
 
 Most visual bugs come from mixing coordinate spaces. Name every conversion explicitly. Common spaces are source image pixels, Scene or Level dimensions, Foundry world coordinates, canvas coordinates after pan and zoom, CSS pixels, and canvas backing-buffer pixels.
@@ -308,7 +322,7 @@ game.settings.register("<module-id>", "showFeature", {
 
 Use `client` for per-user preferences and `world` for shared world configuration. Document each setting's purpose, scope, default, valid values, permission, immediate effect, and migration behavior.
 
-For keybindings, use a namespaced action, localized name and hint, explicit modifier behavior, input guards for editable fields, permission checks at invocation time, and tests for keyboard layouts and conflicting shortcuts.
+For keybindings, use a namespaced action, localized name and hint, explicit modifier behavior, input guards for editable fields, permission checks at invocation time, and tests for keyboard layouts and conflicting shortcuts. Register defaults through Foundry's editable keybinding configuration rather than hard-coding keyboard listeners. Document the defaults in the README and keep the action's permission check at invocation time. A default change should be reflected in the manifest release notes, documentation, and automated tests; users' customized bindings should remain user-controlled.
 
 ## 13. Localization
 
