@@ -194,8 +194,8 @@ For an auto-fitting view:
 5. Center the result and letterbox unused space.
 6. Recalculate after source, container, or device-pixel-ratio changes.
 
-For an `ApplicationV2` window that should support native detachment, allow the
-supported detach action and configure resizing through `DEFAULT_OPTIONS`:
+For an `ApplicationV2` window that supports native detachment and optional
+dynamic sizing, allow the detach action and make the resize control available:
 
 ```js
 _canDetach() {
@@ -204,16 +204,19 @@ _canDetach() {
 
 static DEFAULT_OPTIONS = {
   window: {
-    resizable: false
+    resizable: true
   }
 };
 ```
 
-If the detached view must keep the dimensions it had before detachment, capture
-the current outer and content dimensions in `_onDetach` and apply them while the
-application is detached. Clear that frozen state in `_onAttach` and restore the
-normal auto-fit behavior. This keeps the detached application stable without
-reimplementing Foundry's browser-window lifecycle:
+If resizing is an optional setting, keep the control available in the application
+configuration but hide or disable it while the fixed-size mode is active. Read
+the client setting when the application instance is created and apply the mode
+consistently to attached and detached windows. In the fixed-size mode, capture the current outer and content
+dimensions in `_onDetach` and apply them while detached. On `_onAttach`, restore
+the captured dimensions before clearing the frozen state, then restore normal
+auto-fitting. This prevents a resized detached browser window from leaking its
+dimensions back into the fixed-size main application:
 
 ```js
 _onDetach() {
@@ -221,12 +224,22 @@ _onDetach() {
 }
 
 _onAttach() {
-  // Clear the frozen dimensions and restore normal fitting.
+  // Restore the captured size, clear the frozen dimensions, and restore fitting.
 }
 ```
 
-`resizable: false` disables Foundry's application resize control; browser or
-operating-system window chrome may still be subject to platform-specific behavior.
+In the dynamic mode, resize only the available application/content area and use a
+single uniform scale for both map axes. Do not independently scale width and
+height. The initial automatic fit may use project-specific defaults such as a
+normal scale, minimum edge, and maximum edge; manual resizing should not call
+`setPosition` again on every redraw or it will fight the user's resize gesture.
+The dynamic CSS layout must also let the window content and the map surface fill
+the resized application area; this remains important after native detachment,
+because the same ApplicationV2 content is moved into another document.
+
+In the fixed-size mode, disabling the Foundry resize control preserves the old
+behavior. Browser or operating-system window chrome may still be subject to
+platform-specific behavior.
 Verify detachment, re-attachment, and fixed application sizing against the target
 Foundry version and browser matrix.
 
@@ -344,7 +357,15 @@ game.settings.register("<module-id>", "showFeature", {
 
 Use `client` for per-user preferences and `world` for shared world configuration. Document each setting's purpose, scope, default, valid values, permission, immediate effect, and migration behavior.
 
-For keybindings, use a namespaced action, localized name and hint, explicit modifier behavior, input guards for editable fields, permission checks at invocation time, and tests for keyboard layouts and conflicting shortcuts. Register defaults through Foundry's editable keybinding configuration rather than hard-coding keyboard listeners. Document the defaults in the README and keep the action's permission check at invocation time. A default change should be reflected in the manifest release notes, documentation, and automated tests; users' customized bindings should remain user-controlled.
+For keybindings and settings, use namespaced actions, localized names and hints,
+explicit modifier behavior, input guards for editable fields, permission checks at
+invocation time, and tests for keyboard layouts and conflicting shortcuts.
+Register defaults through Foundry's editable keybinding and settings
+configuration rather than hard-coding behavior. Document scope, default, runtime
+effect, and whether an open application must be reopened after a change. A
+default change should be reflected in release notes, documentation, and automated
+tests; users' customized bindings and client preferences should remain
+user-controlled.
 
 ## 13. Localization
 
@@ -402,7 +423,7 @@ Use the project's package manager and lockfile when a test runner or build tool 
 
 ### 15.2 Recommended coverage
 
-Test manifest parsing and version consistency, localization completeness, setting defaults and migrations, keybinding guards, permissions, missing documents/assets, coordinate conversion, pointer bounds, aspect-ratio preservation, minimum and maximum display sizes, empty and unusual dimensions, fog/perception transitions, and cleanup after close, scene change, and repeated initialization.
+Test manifest parsing and version consistency, localization completeness, setting defaults and migrations, runtime setting mode changes, keybinding guards, permissions, missing documents/assets, coordinate conversion, pointer bounds, aspect-ratio preservation, minimum and maximum display sizes, dynamic resize behavior, empty and unusual dimensions, fog/perception transitions, and cleanup after close, scene change, and repeated initialization.
 
 ### 15.3 Manual Foundry matrix
 

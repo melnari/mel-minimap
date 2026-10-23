@@ -8,6 +8,17 @@
   background: #111;
 }
 
+/* In dynamic mode the ApplicationV2 frame must pass its current dimensions
+   through to the minimap content. This also applies after native detachment,
+   where the same application is rendered in a different document. */
+.mel-minimap--dynamic .window-content {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
 .mel-minimap__content {
   box-sizing: border-box;
   position: relative;
@@ -19,6 +30,12 @@
   background: #171717;
   cursor: crosshair;
   user-select: none;
+}
+
+.mel-minimap--dynamic .mel-minimap__content {
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
 }
 
 .mel-minimap__canvas {

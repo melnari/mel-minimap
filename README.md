@@ -4,7 +4,7 @@ Mel-Minimap is a Foundry Virtual Tabletop module that displays the complete acti
 
 ## Compatibility
 
-- Module version: `1.0.10`
+- Module version: `1.1.0`
 - Foundry Virtual Tabletop: `14.x`
 - Verified with Foundry Virtual Tabletop `14.369`
 
@@ -18,12 +18,13 @@ Mel-Minimap is a Foundry Virtual Tabletop module that displays the complete acti
 - Keeps the shorter map edge at least 300 pixels where possible.
 - Scales very large maps down proportionally so the outer window does not exceed 350 × 350 pixels.
 - Gives the map the maximum possible size when an extreme aspect ratio prevents both size limits from being met.
-- Fits the map automatically. Manual resizing is not required or enabled.
+- Fits the map automatically in the fixed-size mode. Manual resizing is disabled in that mode.
 - Displays the configured grid and a translucent white frame around the current main-canvas viewport.
 - Can be moved or minimized like any other Foundry `ApplicationV2` window.
 - Can be detached into a separate browser window using Foundry's native `Detach` action.
-- A detached minimap keeps the automatically calculated size from the moment of detachment and cannot be resized through Foundry's application resize control.
-- Re-attaching the minimap restores automatic map fitting for the main Foundry window.
+- In fixed-size mode, a detached minimap keeps the automatically calculated size from the moment of detachment and cannot be resized through Foundry's application resize control.
+- In fixed-size mode, re-attaching restores the size captured before detachment and then reapplies automatic map fitting in the main Foundry window.
+- Optional dynamic sizing allows the minimap to be resized while attached or detached; the map always keeps its original aspect ratio.
 - Clicking the minimap centers the main canvas on the selected position without changing the minimap's size or aspect ratio.
 
 ### Tokens
@@ -83,8 +84,9 @@ The settings are client-specific and can be found in Foundry's module settings:
 - **Open minimap when the world starts**: Opens the minimap automatically after the World is ready. Enabled by default.
 - **Show map background**: Displays the active Scene background in the minimap. Enabled by default.
 - **Show Map Notes**: Displays visible Map Note markers and enables Map Note hover actions. Disabled by default.
+- **Enable dynamic minimap size**: Enables manual resizing in the attached and detached windows. The automatic 10% scale, 300-pixel minimum where possible, and 350-pixel maximum remain the initial sizing defaults. Disabled by default.
 
-Changing **Show Map Notes** updates open minimaps immediately.
+Changing **Show Map Notes** updates open minimaps immediately. The dynamic-size setting applies when the minimap is opened again.
 
 ## Usage
 
@@ -111,6 +113,8 @@ All Mel-Minimap keybindings are registered with Foundry and can be changed in **
 The shortcut only applies while the pointer is over the minimap. If the current user does not have the required permission, the shortcut is ignored.
 
 The artwork shortcuts also support `Ctrl+Num1` and `Ctrl+Num2` by default. For players, `Ctrl+1` requires a visible, non-hidden Token with configured Token artwork, but does not require Actor ownership or a displayed Token name. The GM retains the original Actor-artwork behavior. All default bindings can be reassigned in Foundry's Controls configuration.
+
+When **Enable dynamic minimap size** is active, resize the window using Foundry's resize handle while attached or the available window resize controls while detached. The canvas scales uniformly and letterboxes unused space when the window shape differs from the map.
 
 ## Visibility and Fog of War
 

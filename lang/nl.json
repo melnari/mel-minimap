@@ -4,6 +4,8 @@
   "MEL_MINIMAP.AutoOpen": "Minimap openen wanneer de wereld start",
   "MEL_MINIMAP.ShowBackground": "Kaartachtergrond tonen",
   "MEL_MINIMAP.ShowMapNotes": "Kaartnotities tonen",
+  "MEL_MINIMAP.DynamicSize": "Dynamische grootte van de minimap inschakelen",
+  "MEL_MINIMAP.DynamicSizeHint": "Hiermee kan de minimap worden vergroot of verkleind met behoud van de kaartverhouding.",
   "MEL_MINIMAP.NoScene": "Geen actieve scène",
   "MEL_MINIMAP.NoCanvas": "Canvas is nog niet gereed",
   "MEL_MINIMAP.Legend.Party": "Groep",

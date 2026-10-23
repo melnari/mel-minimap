@@ -14,6 +14,7 @@ import {
   openMapNoteJournal
 } from "./map-note.mjs";
 import { getKeybindingDefaults } from "./keybindings.mjs";
+import { DYNAMIC_SIZE_SETTING, DEFAULT_DYNAMIC_SIZE, isDynamicSizeEnabled } from "./minimap-settings.mjs";
 
 const MODULE_ID = "mel-minimap";
 const MINIMAP_ID = `${MODULE_ID}-window`;
@@ -44,7 +45,9 @@ class MelMinimap extends ApplicationV2 {
     window: {
       title: "MEL_MINIMAP.Title",
       icon: "fa-solid fa-map",
-      resizable: false,
+      // The resize control is hidden by the fixed-size mode at runtime. It is
+      // present here so the dynamic-size setting can be applied per instance.
+      resizable: true,
       minimizable: true
     }
   };
@@ -65,6 +68,7 @@ class MelMinimap extends ApplicationV2 {
   #imageCache = new Map();
   #lastSize = "";
   #fittedMapSignature = "";
+  #dynamicSize = DEFAULT_DYNAMIC_SIZE;
   #detached = false;
   #detachedSize = null;
   #hoveredToken = null;
@@ -73,7 +77,12 @@ class MelMinimap extends ApplicationV2 {
 
   constructor(options = {}) {
     super(options);
+    this.#dynamicSize = isDynamicSizeEnabled();
     MelMinimap._instances.add(this);
+  }
+
+  #isDynamicSizeEnabled() {
+    return this.#dynamicSize;
   }
 
   async _renderHTML() {
@@ -130,6 +139,7 @@ class MelMinimap extends ApplicationV2 {
 
   async _onRender() {
     this.#startRefreshLoop();
+    this.#updateResizeControl();
     const map = this.#getMapBounds(globalThis.canvas?.dimensions, globalThis.canvas?.scene);
     if (map) this.#fitWindowToMap(map);
     this.#draw();
@@ -141,6 +151,12 @@ class MelMinimap extends ApplicationV2 {
    * as well because the detached document may have different frame metrics.
    */
   _onDetach() {
+    if (this.#isDynamicSizeEnabled()) {
+      this.#detached = true;
+      this.#detachedSize = null;
+      return;
+    }
+
     const frameRect = this.element?.getBoundingClientRect?.();
     const contentRect = this.window?.content?.getBoundingClientRect?.();
     const width = Math.round(Number(this.position?.width) || frameRect?.width || 0);
@@ -158,12 +174,21 @@ class MelMinimap extends ApplicationV2 {
     this.#applyDetachedSize();
   }
 
-  /** Restore automatic map fitting after the window returns to Foundry. */
+  /** Restore the captured fixed size before fitting the map again. */
   _onAttach() {
+    const restoredSize = this.#detachedSize;
+    const dynamicSize = this.#isDynamicSizeEnabled();
+
     this.#detached = false;
     this.#detachedSize = null;
     this.#fittedMapSignature = "";
-    if (this.rendered) void this.render();
+
+    // Foundry may retain the dimensions of the detached browser document when
+    // the ApplicationV2 instance is moved back into the main document. Apply
+    // the dimensions captured before detachment first so an enlarged detached
+    // browser window cannot leak into fixed-size mode after re-attachment.
+    if (!dynamicSize && restoredSize) this.#applyFixedSize(restoredSize);
+    if (this.rendered) void this.render(true);
   }
 
   async _onClose() {
@@ -290,7 +315,8 @@ class MelMinimap extends ApplicationV2 {
   }
 
   #fitWindowToMap(map) {
-    if (this.#detached) {
+    const dynamicSize = this.#isDynamicSizeEnabled();
+    if (this.#detached && !dynamicSize) {
       this.#applyDetachedSize();
       return;
     }
@@ -305,6 +331,16 @@ class MelMinimap extends ApplicationV2 {
     const frameRect = frame.getBoundingClientRect();
     const contentRect = content.getBoundingClientRect();
     if (!contentRect.width || !contentRect.height) return;
+
+    if (dynamicSize) {
+      // The outer ApplicationV2 window is fitted once using the normal
+      // defaults. Later manual resizing changes the available content area;
+      // the canvas projection handles that size without another setPosition.
+      this.#content.style.width = "100%";
+      this.#content.style.height = "100%";
+      this.#content.style.flex = "1 1 auto";
+      if (signature === this.#fittedMapSignature) return;
+    }
 
     // Determine the frame chrome before sizing the map. The resulting outer
     // window, not only the inner canvas, stays within 350 px on both axes.
@@ -330,9 +366,10 @@ class MelMinimap extends ApplicationV2 {
     const contentWidth = Math.max(1, Math.round(map.width * mapScale));
     const contentHeight = Math.max(1, Math.round(map.height * mapScale));
 
-    // Do not let the Foundry window layout stretch the map surface. The
-    // canvas must receive the exact target aspect ratio calculated above.
-    if (this.#content) {
+    // In fixed-size mode, do not let the Foundry window layout stretch the map
+    // surface. Dynamic mode intentionally keeps the content at 100% so later
+    // attached or detached window resizing reaches the canvas.
+    if (!dynamicSize && this.#content) {
       this.#content.style.width = `${contentWidth}px`;
       this.#content.style.height = `${contentHeight}px`;
       this.#content.style.flex = "0 0 auto";
@@ -349,10 +386,19 @@ class MelMinimap extends ApplicationV2 {
     this.#fittedMapSignature = signature;
   }
 
-  /** Keep the detached Application at the dimensions captured on detach. */
-  #applyDetachedSize() {
-    const size = this.#detachedSize;
-    if (!this.#detached || !size) return;
+  #updateResizeControl() {
+    const dynamicSize = this.#isDynamicSizeEnabled();
+    this.element?.classList.toggle("mel-minimap--dynamic", dynamicSize);
+
+    const resizeControl = this.window?.resize;
+    if (!resizeControl) return;
+    resizeControl.hidden = !dynamicSize;
+    resizeControl.style.display = dynamicSize ? "" : "none";
+    resizeControl.style.pointerEvents = dynamicSize ? "" : "none";
+  }
+
+  #applyFixedSize(size) {
+    if (!size) return;
 
     if (this.#content) {
       this.#content.style.width = `${size.contentWidth}px`;
@@ -365,6 +411,12 @@ class MelMinimap extends ApplicationV2 {
     if (currentWidth !== size.width || currentHeight !== size.height) {
       this.setPosition({ width: size.width, height: size.height });
     }
+  }
+
+  /** Keep the detached Application at the dimensions captured on detach. */
+  #applyDetachedSize() {
+    if (!this.#detached) return;
+    this.#applyFixedSize(this.#detachedSize);
   }
 
   #worldToMapX(map, value) {
@@ -942,6 +994,15 @@ Hooks.once("init", () => {
     onChange: () => {
       for (const minimap of MelMinimap._instances) minimap.redraw();
     }
+  });
+
+  game.settings.register(MODULE_ID, DYNAMIC_SIZE_SETTING, {
+    name: "MEL_MINIMAP.DynamicSize",
+    hint: "MEL_MINIMAP.DynamicSizeHint",
+    scope: "client",
+    config: true,
+    type: Boolean,
+    default: DEFAULT_DYNAMIC_SIZE
   });
 
   game.keybindings.register(MODULE_ID, "toggleMinimap", {
