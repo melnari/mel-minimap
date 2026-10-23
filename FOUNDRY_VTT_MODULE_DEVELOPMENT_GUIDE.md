@@ -194,19 +194,41 @@ For an auto-fitting view:
 5. Center the result and letterbox unused space.
 6. Recalculate after source, container, or device-pixel-ratio changes.
 
-For an `ApplicationV2` window that must remain in the main Foundry workspace, use
-the application's supported detach permission hook instead of manipulating browser
-windows directly:
+For an `ApplicationV2` window that should support native detachment, allow the
+supported detach action and configure resizing through `DEFAULT_OPTIONS`:
 
 ```js
 _canDetach() {
-  return false;
+  return true;
+}
+
+static DEFAULT_OPTIONS = {
+  window: {
+    resizable: false
+  }
+};
+```
+
+If the detached view must keep the dimensions it had before detachment, capture
+the current outer and content dimensions in `_onDetach` and apply them while the
+application is detached. Clear that frozen state in `_onAttach` and restore the
+normal auto-fit behavior. This keeps the detached application stable without
+reimplementing Foundry's browser-window lifecycle:
+
+```js
+_onDetach() {
+  // Capture the current fitted dimensions.
+}
+
+_onAttach() {
+  // Clear the frozen dimensions and restore normal fitting.
 }
 ```
 
-This disables the native Detach action for that application while leaving ordinary
-window movement and minimization available. Verify the behavior against the target
-Foundry version's `ApplicationV2` API.
+`resizable: false` disables Foundry's application resize control; browser or
+operating-system window chrome may still be subject to platform-specific behavior.
+Verify detachment, re-attachment, and fixed application sizing against the target
+Foundry version and browser matrix.
 
 ## 8. Canvas, images, and coordinate systems
 

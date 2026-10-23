@@ -51,12 +51,9 @@ class MelMinimap extends ApplicationV2 {
 
   static _instances = new Set();
 
-  /**
-   * Keep Mel-Minimap in the current Foundry window.
-   * Foundry uses this gate for the native ApplicationV2 Detach action.
-   */
+  /** Allow the native ApplicationV2 Detach action. */
   _canDetach() {
-    return false;
+    return true;
   }
 
   #content = null;
@@ -68,6 +65,8 @@ class MelMinimap extends ApplicationV2 {
   #imageCache = new Map();
   #lastSize = "";
   #fittedMapSignature = "";
+  #detached = false;
+  #detachedSize = null;
   #hoveredToken = null;
   #hoveredNote = null;
   #pointerPosition = null;
@@ -136,9 +135,42 @@ class MelMinimap extends ApplicationV2 {
     this.#draw();
   }
 
+  /**
+   * Preserve the currently fitted dimensions when the ApplicationV2 window
+   * moves to a separate browser window. The content dimensions are captured
+   * as well because the detached document may have different frame metrics.
+   */
+  _onDetach() {
+    const frameRect = this.element?.getBoundingClientRect?.();
+    const contentRect = this.window?.content?.getBoundingClientRect?.();
+    const width = Math.round(Number(this.position?.width) || frameRect?.width || 0);
+    const height = Math.round(Number(this.position?.height) || frameRect?.height || 0);
+    const contentWidth = Math.round(contentRect?.width || this.#content?.getBoundingClientRect?.().width || 0);
+    const contentHeight = Math.round(contentRect?.height || this.#content?.getBoundingClientRect?.().height || 0);
+
+    this.#detached = true;
+    this.#detachedSize = {
+      width: Math.max(1, width),
+      height: Math.max(1, height),
+      contentWidth: Math.max(1, contentWidth),
+      contentHeight: Math.max(1, contentHeight)
+    };
+    this.#applyDetachedSize();
+  }
+
+  /** Restore automatic map fitting after the window returns to Foundry. */
+  _onAttach() {
+    this.#detached = false;
+    this.#detachedSize = null;
+    this.#fittedMapSignature = "";
+    if (this.rendered) void this.render();
+  }
+
   async _onClose() {
     this.#stopRefreshLoop();
     this.#clearTokenHover();
+    this.#detached = false;
+    this.#detachedSize = null;
     MelMinimap._instances.delete(this);
   }
 
@@ -258,6 +290,11 @@ class MelMinimap extends ApplicationV2 {
   }
 
   #fitWindowToMap(map) {
+    if (this.#detached) {
+      this.#applyDetachedSize();
+      return;
+    }
+
     const sceneId = globalThis.canvas?.scene?.id ?? "unknown-scene";
     const signature = `${sceneId}:${map.source ?? ""}:${map.width}:${map.height}`;
 
@@ -310,6 +347,24 @@ class MelMinimap extends ApplicationV2 {
       height: contentHeight + Math.round(chromeHeight)
     });
     this.#fittedMapSignature = signature;
+  }
+
+  /** Keep the detached Application at the dimensions captured on detach. */
+  #applyDetachedSize() {
+    const size = this.#detachedSize;
+    if (!this.#detached || !size) return;
+
+    if (this.#content) {
+      this.#content.style.width = `${size.contentWidth}px`;
+      this.#content.style.height = `${size.contentHeight}px`;
+      this.#content.style.flex = "0 0 auto";
+    }
+
+    const currentWidth = Number(this.position?.width);
+    const currentHeight = Number(this.position?.height);
+    if (currentWidth !== size.width || currentHeight !== size.height) {
+      this.setPosition({ width: size.width, height: size.height });
+    }
   }
 
   #worldToMapX(map, value) {

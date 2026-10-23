@@ -21,7 +21,9 @@ Mel-Minimap is a Foundry Virtual Tabletop module that displays the complete acti
 - Fits the map automatically. Manual resizing is not required or enabled.
 - Displays the configured grid and a translucent white frame around the current main-canvas viewport.
 - Can be moved or minimized like any other Foundry `ApplicationV2` window.
-- Cannot be detached into a separate browser window; the native Foundry `Detach` action is disabled.
+- Can be detached into a separate browser window using Foundry's native `Detach` action.
+- A detached minimap keeps the automatically calculated size from the moment of detachment and cannot be resized through Foundry's application resize control.
+- Re-attaching the minimap restores automatic map fitting for the main Foundry window.
 - Clicking the minimap centers the main canvas on the selected position without changing the minimap's size or aspect ratio.
 
 ### Tokens
