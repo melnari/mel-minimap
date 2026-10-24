@@ -4,7 +4,7 @@ Mel-Minimap is a Foundry Virtual Tabletop module that displays the complete acti
 
 ## Compatibility
 
-- Module version: `1.1.0`
+- Module version: `1.1.1`
 - Foundry Virtual Tabletop: `14.x`
 - Verified with Foundry Virtual Tabletop `14.369`
 
@@ -40,7 +40,7 @@ The user's own Token is highlighted with a white marker and blue outline. Hoveri
 
 ### Map Notes
 
-Map Notes use their configured Foundry icon and `iconSize`, scaled proportionally to the complete Scene. The feature is controlled by the client setting **Show Map Notes**, which is disabled by default.
+Map Notes use their configured Foundry icon and `iconSize`, scaled proportionally to the complete Scene. The feature is controlled by the world setting **Show Map Notes**, which is disabled by default.
 
 When the pointer hovers over a Map Note, its custom Note text or linked Journal title is shown in the top-left information area. Pressing `V` opens the linked Journal Entry and, when configured, its linked Journal Entry Page.
 
@@ -79,14 +79,14 @@ The installed folder must be named `mel-minimap`, matching the module ID in `mod
 
 ## Configuration
 
-The settings are client-specific and can be found in Foundry's module settings:
+Mel-Minimap settings are world settings. The GM configures them in Foundry's module settings, and the same values apply to every connected player. Players cannot override these settings with browser-local values. On the first update from an earlier release, the current GM values are migrated to the world settings.
 
 - **Open minimap when the world starts**: Opens the minimap automatically after the World is ready. Enabled by default.
 - **Show map background**: Displays the active Scene background in the minimap. Enabled by default.
 - **Show Map Notes**: Displays visible Map Note markers and enables Map Note hover actions. Disabled by default.
-- **Enable dynamic minimap size**: Enables manual resizing in the attached and detached windows. The automatic 10% scale, 300-pixel minimum where possible, and 350-pixel maximum remain the initial sizing defaults. Disabled by default.
+- **Enable dynamic minimap size**: Enables manual resizing in the attached and detached windows. The automatic 10% scale, 300-pixel minimum where possible, and 350-pixel maximum remain the initial sizing defaults. Enabled by default for new worlds.
 
-Changing **Show Map Notes** updates open minimaps immediately. The dynamic-size setting applies when the minimap is opened again.
+Changing **Show Map Notes**, **Show map background**, or **Enable dynamic minimap size** updates open minimaps for all connected users. Changing **Open minimap when the world starts** synchronizes the current minimap visibility and is also used at the next world startup.
 
 ## Usage
 

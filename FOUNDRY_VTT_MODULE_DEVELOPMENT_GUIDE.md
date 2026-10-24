@@ -355,7 +355,14 @@ game.settings.register("<module-id>", "showFeature", {
 });
 ```
 
-Use `client` for per-user preferences and `world` for shared world configuration. Document each setting's purpose, scope, default, valid values, permission, immediate effect, and migration behavior.
+Use `client` for per-user preferences and `world` for shared world configuration. A module feature that must apply identically to every connected player must use a world setting; players without the Configure Settings permission cannot change it. Document each setting's purpose, scope, default, valid values, permission, immediate effect, and migration behavior.
+
+When changing an existing setting from client scope to world scope, add an explicit
+one-time migration. Read the previous GM client values from the old client storage,
+write them to the new world settings, and record a world-level migration version.
+Do not use a player's local value as the source for the shared setting, and do not
+repeat the migration after the world value has been established. Handle the case
+where no legacy value exists by using the registered default.
 
 For keybindings and settings, use namespaced actions, localized names and hints,
 explicit modifier behavior, input guards for editable fields, permission checks at

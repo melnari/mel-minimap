@@ -14,7 +14,16 @@ import {
   openMapNoteJournal
 } from "./map-note.mjs";
 import { getKeybindingDefaults } from "./keybindings.mjs";
-import { DYNAMIC_SIZE_SETTING, DEFAULT_DYNAMIC_SIZE, isDynamicSizeEnabled } from "./minimap-settings.mjs";
+import {
+  DEFAULT_SETTINGS,
+  DYNAMIC_SIZE_SETTING,
+  DEFAULT_DYNAMIC_SIZE,
+  readLegacyClientSetting,
+  SETTINGS,
+  SETTINGS_MIGRATION_SETTING,
+  SETTINGS_MIGRATION_VERSION,
+  isDynamicSizeEnabled
+} from "./minimap-settings.mjs";
 
 const MODULE_ID = "mel-minimap";
 const MINIMAP_ID = `${MODULE_ID}-window`;
@@ -83,6 +92,20 @@ class MelMinimap extends ApplicationV2 {
 
   #isDynamicSizeEnabled() {
     return this.#dynamicSize;
+  }
+
+  /** Apply a world-level dynamic-size change to an already open minimap. */
+  applyDynamicSizeSetting(enabled) {
+    const dynamicSize = Boolean(enabled);
+    if (this.#dynamicSize === dynamicSize) return;
+
+    if (!dynamicSize && this.#detached) this.#detachedSize = this.#captureCurrentSize();
+    if (dynamicSize) this.#detachedSize = null;
+
+    this.#dynamicSize = dynamicSize;
+    this.#fittedMapSignature = "";
+    this.#updateResizeControl();
+    if (this.rendered) void this.render(true);
   }
 
   async _renderHTML() {
@@ -157,20 +180,8 @@ class MelMinimap extends ApplicationV2 {
       return;
     }
 
-    const frameRect = this.element?.getBoundingClientRect?.();
-    const contentRect = this.window?.content?.getBoundingClientRect?.();
-    const width = Math.round(Number(this.position?.width) || frameRect?.width || 0);
-    const height = Math.round(Number(this.position?.height) || frameRect?.height || 0);
-    const contentWidth = Math.round(contentRect?.width || this.#content?.getBoundingClientRect?.().width || 0);
-    const contentHeight = Math.round(contentRect?.height || this.#content?.getBoundingClientRect?.().height || 0);
-
     this.#detached = true;
-    this.#detachedSize = {
-      width: Math.max(1, width),
-      height: Math.max(1, height),
-      contentWidth: Math.max(1, contentWidth),
-      contentHeight: Math.max(1, contentHeight)
-    };
+    this.#detachedSize = this.#captureCurrentSize();
     this.#applyDetachedSize();
   }
 
@@ -413,6 +424,23 @@ class MelMinimap extends ApplicationV2 {
     }
   }
 
+  #captureCurrentSize() {
+    const frameRect = this.element?.getBoundingClientRect?.();
+    const contentRect = this.window?.content?.getBoundingClientRect?.();
+    const contentElementRect = this.#content?.getBoundingClientRect?.();
+    const width = Math.round(Number(this.position?.width) || frameRect?.width || 0);
+    const height = Math.round(Number(this.position?.height) || frameRect?.height || 0);
+    const contentWidth = Math.round(contentRect?.width || contentElementRect?.width || 0);
+    const contentHeight = Math.round(contentRect?.height || contentElementRect?.height || 0);
+
+    return {
+      width: Math.max(1, width),
+      height: Math.max(1, height),
+      contentWidth: Math.max(1, contentWidth),
+      contentHeight: Math.max(1, contentHeight)
+    };
+  }
+
   /** Keep the detached Application at the dimensions captured on detach. */
   #applyDetachedSize() {
     if (!this.#detached) return;
@@ -436,7 +464,7 @@ class MelMinimap extends ApplicationV2 {
   }
 
   #drawMapBackground(context, scene, map) {
-    if (!game.settings.get(MODULE_ID, "showBackground")) {
+    if (!game.settings.get(MODULE_ID, SETTINGS.SHOW_BACKGROUND)) {
       context.fillStyle = "#232323";
       context.fillRect(map.x, map.y, map.width, map.height);
       return;
@@ -566,7 +594,7 @@ class MelMinimap extends ApplicationV2 {
   }
 
   #getMapNoteMarkers(scene, map) {
-    if (!game.settings.get(MODULE_ID, "showMapNotes")) return [];
+    if (!game.settings.get(MODULE_ID, SETTINGS.SHOW_MAP_NOTES)) return [];
 
     const notes = globalThis.canvas?.notes?.placeables ?? [];
     const isGM = Boolean(game.user?.isGM);
@@ -965,44 +993,89 @@ function toggleMinimap() {
   void new MelMinimap().render({ force: true });
 }
 
+function handleWorldSettingChange(key, value) {
+  if (key === SETTINGS.AUTO_OPEN) {
+    if (!game.ready) return;
+    const minimap = getMinimap();
+    if (value && !minimap) toggleMinimap();
+    else if (!value && minimap) void minimap.close();
+    return;
+  }
+
+  if (key === SETTINGS.DYNAMIC_SIZE) {
+    for (const minimap of MelMinimap._instances) minimap.applyDynamicSizeSetting(value);
+    return;
+  }
+
+  if (key === SETTINGS.SHOW_BACKGROUND || key === SETTINGS.SHOW_MAP_NOTES) {
+    for (const minimap of MelMinimap._instances) minimap.redraw();
+  }
+}
+
+async function migrateLegacyClientSettings() {
+  if (!game.user?.isGM) return;
+
+  const currentVersion = Number(game.settings.get(MODULE_ID, SETTINGS_MIGRATION_SETTING)) || 0;
+  if (currentVersion >= SETTINGS_MIGRATION_VERSION) return;
+
+  const clientStorage = game.settings.storage.get("client");
+  try {
+    for (const [key, fallback] of Object.entries(DEFAULT_SETTINGS)) {
+      const value = readLegacyClientSetting(clientStorage, key, fallback);
+      await game.settings.set(MODULE_ID, key, value);
+    }
+    await game.settings.set(MODULE_ID, SETTINGS_MIGRATION_SETTING, SETTINGS_MIGRATION_VERSION);
+  } catch (error) {
+    console.error(`${MODULE_ID} could not migrate client settings to world settings`, error);
+  }
+}
+
 Hooks.once("init", () => {
-  game.settings.register(MODULE_ID, "autoOpen", {
+  game.settings.register(MODULE_ID, SETTINGS.AUTO_OPEN, {
     name: "MEL_MINIMAP.AutoOpen",
     hint: "",
-    scope: "client",
+    scope: "world",
     config: true,
     type: Boolean,
-    default: true
+    default: DEFAULT_SETTINGS[SETTINGS.AUTO_OPEN],
+    onChange: value => handleWorldSettingChange(SETTINGS.AUTO_OPEN, value)
   });
 
-  game.settings.register(MODULE_ID, "showBackground", {
+  game.settings.register(MODULE_ID, SETTINGS.SHOW_BACKGROUND, {
     name: "MEL_MINIMAP.ShowBackground",
     hint: "",
-    scope: "client",
+    scope: "world",
     config: true,
     type: Boolean,
-    default: true
+    default: DEFAULT_SETTINGS[SETTINGS.SHOW_BACKGROUND],
+    onChange: value => handleWorldSettingChange(SETTINGS.SHOW_BACKGROUND, value)
   });
 
-  game.settings.register(MODULE_ID, "showMapNotes", {
+  game.settings.register(MODULE_ID, SETTINGS.SHOW_MAP_NOTES, {
     name: "MEL_MINIMAP.ShowMapNotes",
     hint: "",
-    scope: "client",
+    scope: "world",
     config: true,
     type: Boolean,
-    default: false,
-    onChange: () => {
-      for (const minimap of MelMinimap._instances) minimap.redraw();
-    }
+    default: DEFAULT_SETTINGS[SETTINGS.SHOW_MAP_NOTES],
+    onChange: value => handleWorldSettingChange(SETTINGS.SHOW_MAP_NOTES, value)
   });
 
   game.settings.register(MODULE_ID, DYNAMIC_SIZE_SETTING, {
     name: "MEL_MINIMAP.DynamicSize",
     hint: "MEL_MINIMAP.DynamicSizeHint",
-    scope: "client",
+    scope: "world",
     config: true,
     type: Boolean,
-    default: DEFAULT_DYNAMIC_SIZE
+    default: DEFAULT_DYNAMIC_SIZE,
+    onChange: value => handleWorldSettingChange(SETTINGS.DYNAMIC_SIZE, value)
+  });
+
+  game.settings.register(MODULE_ID, SETTINGS_MIGRATION_SETTING, {
+    scope: "world",
+    config: false,
+    type: Number,
+    default: 0
   });
 
   game.keybindings.register(MODULE_ID, "toggleMinimap", {
@@ -1057,8 +1130,9 @@ Hooks.on("getSceneControlButtons", controls => {
   };
 });
 
-Hooks.once("ready", () => {
-  if (game.settings.get(MODULE_ID, "autoOpen")) toggleMinimap();
+Hooks.once("ready", async () => {
+  await migrateLegacyClientSettings();
+  if (game.settings.get(MODULE_ID, SETTINGS.AUTO_OPEN) && !getMinimap()) toggleMinimap();
 });
 
 for (const hook of [
