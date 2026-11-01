@@ -2,18 +2,24 @@ export const SETTINGS = Object.freeze({
   AUTO_OPEN: "autoOpen",
   SHOW_BACKGROUND: "showBackground",
   SHOW_MAP_NOTES: "showMapNotes",
-  DYNAMIC_SIZE: "dynamicSize"
+  DYNAMIC_SIZE: "dynamicSize",
+  PERFORMANCE_OPTIMIZATION: "performanceOptimization"
 });
 
 export const DEFAULT_SETTINGS = Object.freeze({
   [SETTINGS.AUTO_OPEN]: true,
   [SETTINGS.SHOW_BACKGROUND]: true,
   [SETTINGS.SHOW_MAP_NOTES]: false,
-  [SETTINGS.DYNAMIC_SIZE]: true
+  [SETTINGS.DYNAMIC_SIZE]: true,
+  [SETTINGS.PERFORMANCE_OPTIMIZATION]: false
 });
 
 export const DYNAMIC_SIZE_SETTING = SETTINGS.DYNAMIC_SIZE;
 export const DEFAULT_DYNAMIC_SIZE = DEFAULT_SETTINGS[DYNAMIC_SIZE_SETTING];
+export const PERFORMANCE_OPTIMIZATION_SETTING = SETTINGS.PERFORMANCE_OPTIMIZATION;
+export const DEFAULT_PERFORMANCE_OPTIMIZATION = DEFAULT_SETTINGS[PERFORMANCE_OPTIMIZATION_SETTING];
+export const FOG_DEBOUNCE_OPTIMIZED_MS = 500;
+export const FOG_DEBOUNCE_RESPONSIVE_MS = 250;
 export const SETTINGS_MIGRATION_SETTING = "settingsMigration";
 export const SETTINGS_MIGRATION_VERSION = 1;
 
@@ -43,4 +49,19 @@ export function isDynamicSizeEnabled(settings = globalThis.game?.settings) {
   } catch {
     return DEFAULT_DYNAMIC_SIZE;
   }
+}
+
+/** Read the shared performance setting without making UI initialization fragile. */
+export function isPerformanceOptimizationEnabled(settings = globalThis.game?.settings) {
+  try {
+    const value = settings?.get?.("mel-minimap", SETTINGS.PERFORMANCE_OPTIMIZATION);
+    return value === undefined ? DEFAULT_PERFORMANCE_OPTIMIZATION : Boolean(value);
+  } catch {
+    return DEFAULT_PERFORMANCE_OPTIMIZATION;
+  }
+}
+
+/** Select the debounce delay used for expensive Fog of War rebuilds. */
+export function getFogDebounceDelay(optimized) {
+  return optimized ? FOG_DEBOUNCE_OPTIMIZED_MS : FOG_DEBOUNCE_RESPONSIVE_MS;
 }

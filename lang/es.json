@@ -6,6 +6,8 @@
   "MEL_MINIMAP.ShowMapNotes": "Mostrar las notas del mapa",
   "MEL_MINIMAP.DynamicSize": "Activar el tamaño dinámico del minimapa",
   "MEL_MINIMAP.DynamicSizeHint": "Permite cambiar el tamaño del minimapa manteniendo la proporción del mapa.",
+  "MEL_MINIMAP.PerformanceOptimization": "Optimización de rendimiento para mapas grandes",
+  "MEL_MINIMAP.PerformanceOptimizationHint": "Reduce la frecuencia de las actualizaciones costosas de la niebla de guerra para mejorar el rendimiento en escenas grandes.",
   "MEL_MINIMAP.NoScene": "No hay ninguna escena activa",
   "MEL_MINIMAP.NoCanvas": "El lienzo aún no está listo",
   "MEL_MINIMAP.Legend.Party": "Grupo",

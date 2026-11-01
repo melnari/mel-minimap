@@ -18,6 +18,10 @@ import {
   DEFAULT_SETTINGS,
   DYNAMIC_SIZE_SETTING,
   DEFAULT_DYNAMIC_SIZE,
+  DEFAULT_PERFORMANCE_OPTIMIZATION,
+  getFogDebounceDelay,
+  isPerformanceOptimizationEnabled,
+  PERFORMANCE_OPTIMIZATION_SETTING,
   readLegacyClientSetting,
   SETTINGS,
   SETTINGS_MIGRATION_SETTING,
@@ -31,6 +35,7 @@ const DEFAULT_SIZE = 300;
 const MAP_SCALE = 0.10;
 const MIN_MAP_EDGE = 300;
 const MAX_MINIMAP_EDGE = 350;
+const FOG_MAX_SAMPLES = 64;
 
 const { ApplicationV2 } = foundry.applications.api;
 
@@ -73,7 +78,8 @@ class MelMinimap extends ApplicationV2 {
   #status = null;
   #tokenInfo = null;
   #context = null;
-  #animationFrame = null;
+  #drawFrame = null;
+  #resizeObserver = null;
   #imageCache = new Map();
   #lastSize = "";
   #fittedMapSignature = "";
@@ -83,10 +89,19 @@ class MelMinimap extends ApplicationV2 {
   #hoveredToken = null;
   #hoveredNote = null;
   #pointerPosition = null;
+  #performanceOptimization = DEFAULT_PERFORMANCE_OPTIMIZATION;
+  #fogRefreshTimer = null;
+  #fogBuildTimer = null;
+  #fogBuild = null;
+  #fogBuildGeneration = 0;
+  #fogMaskCanvas = null;
+  #fogMaskSignature = "";
+  #fogMaskDirty = true;
 
   constructor(options = {}) {
     super(options);
     this.#dynamicSize = isDynamicSizeEnabled();
+    this.#performanceOptimization = isPerformanceOptimizationEnabled();
     MelMinimap._instances.add(this);
   }
 
@@ -106,6 +121,16 @@ class MelMinimap extends ApplicationV2 {
     this.#fittedMapSignature = "";
     this.#updateResizeControl();
     if (this.rendered) void this.render(true);
+  }
+
+  /** Apply a world-level performance setting to an already open minimap. */
+  applyPerformanceOptimizationSetting(enabled) {
+    const optimized = Boolean(enabled);
+    if (this.#performanceOptimization === optimized) return;
+    this.#performanceOptimization = optimized;
+    if (this.#fogRefreshTimer) {
+      this.#queueFogRefresh();
+    }
   }
 
   async _renderHTML() {
@@ -154,6 +179,14 @@ class MelMinimap extends ApplicationV2 {
     this.#status = result.querySelector(".mel-minimap__status");
     this.#tokenInfo = result.querySelector(".mel-minimap__token-info");
     this.#context = this.#mapCanvas.getContext("2d");
+    this.#resizeObserver?.disconnect();
+    const ResizeObserverClass = this.#mapCanvas.ownerDocument?.defaultView?.ResizeObserver
+      ?? globalThis.ResizeObserver;
+    if (ResizeObserverClass) {
+      this.#resizeObserver = new ResizeObserverClass(() => this.#scheduleDraw());
+      this.#resizeObserver.observe(result);
+    }
+    this.#invalidateFogMask();
     // A render replaces the HTML canvas with a new element whose backing
     // buffer starts at the browser default of 300x150. Force the next draw
     // to size that new buffer to its actual CSS dimensions.
@@ -161,7 +194,6 @@ class MelMinimap extends ApplicationV2 {
   }
 
   async _onRender() {
-    this.#startRefreshLoop();
     this.#updateResizeControl();
     const map = this.#getMapBounds(globalThis.canvas?.dimensions, globalThis.canvas?.scene);
     if (map) this.#fitWindowToMap(map);
@@ -203,7 +235,11 @@ class MelMinimap extends ApplicationV2 {
   }
 
   async _onClose() {
-    this.#stopRefreshLoop();
+    this.#cancelScheduledDraw();
+    this.#cancelFogRefresh();
+    this.#cancelFogBuild();
+    this.#resizeObserver?.disconnect();
+    this.#resizeObserver = null;
     this.#clearTokenHover();
     this.#detached = false;
     this.#detachedSize = null;
@@ -214,19 +250,56 @@ class MelMinimap extends ApplicationV2 {
     this.#draw();
   }
 
-  #startRefreshLoop() {
-    if (this.#animationFrame) return;
-    const tick = () => {
-      this.#animationFrame = window.requestAnimationFrame(tick);
-      this.#draw();
-    };
-    this.#animationFrame = window.requestAnimationFrame(tick);
+  requestFogRefresh({immediate=false} = {}) {
+    this.#invalidateFogMask();
+    this.#queueFogRefresh({immediate});
+    this.#draw();
   }
 
-  #stopRefreshLoop() {
-    if (!this.#animationFrame) return;
-    window.cancelAnimationFrame(this.#animationFrame);
-    this.#animationFrame = null;
+  #scheduleDraw() {
+    if (this.#drawFrame) return;
+    this.#drawFrame = window.requestAnimationFrame(() => {
+      this.#drawFrame = null;
+      this.#draw();
+    });
+  }
+
+  #cancelScheduledDraw() {
+    if (!this.#drawFrame) return;
+    window.cancelAnimationFrame(this.#drawFrame);
+    this.#drawFrame = null;
+  }
+
+  #getFogDebounceDelay() {
+    return getFogDebounceDelay(this.#performanceOptimization);
+  }
+
+  #queueFogRefresh({immediate=false} = {}) {
+    if (this.#fogRefreshTimer) {
+      clearTimeout(this.#fogRefreshTimer);
+      this.#fogRefreshTimer = null;
+    }
+
+    const refresh = () => {
+      this.#fogRefreshTimer = null;
+      this.#startFogMaskBuild();
+      this.#draw();
+    };
+    if (immediate) refresh();
+    else this.#fogRefreshTimer = setTimeout(refresh, this.#getFogDebounceDelay());
+  }
+
+  #cancelFogRefresh() {
+    if (!this.#fogRefreshTimer) return;
+    clearTimeout(this.#fogRefreshTimer);
+    this.#fogRefreshTimer = null;
+  }
+
+  #cancelFogBuild() {
+    this.#fogBuildGeneration += 1;
+    if (this.#fogBuildTimer) clearTimeout(this.#fogBuildTimer);
+    this.#fogBuildTimer = null;
+    this.#fogBuild = null;
   }
 
   #draw() {
@@ -513,28 +586,119 @@ class MelMinimap extends ApplicationV2 {
   #drawFogMask(context, dimensions, scene, map) {
     if (game.user?.isGM || !this.#hasFogOfWar(scene)) return;
 
-    // Sampling at roughly one grid cell keeps the mask inexpensive while
-    // still hiding unexplored/currently unseen areas and their contents.
-    const sampleSize = Math.max(32, Number(dimensions.size) || 100);
+    const signature = this.#getFogMaskSignature(dimensions, scene, map);
+    if (this.#fogMaskCanvas && !this.#fogMaskDirty && this.#fogMaskSignature === signature) {
+      context.drawImage(this.#fogMaskCanvas, map.x, map.y, map.width, map.height);
+      return;
+    }
+
+    // A pending or in-progress rebuild masks the complete map until the new
+    // visibility result is available. This avoids revealing newly hidden areas
+    // while keeping the expensive work outside the synchronous draw call.
+    if (!this.#fogBuild && !this.#fogRefreshTimer) this.#startFogMaskBuild();
     context.save();
     context.fillStyle = "rgb(0 0 0 / 94%)";
-
-    for (let worldY = map.worldY; worldY < map.worldY + map.worldHeight; worldY += sampleSize) {
-      for (let worldX = map.worldX; worldX < map.worldX + map.worldWidth; worldX += sampleSize) {
-        const point = {
-          x: worldX + Math.min(sampleSize, map.worldX + map.worldWidth - worldX) / 2,
-          y: worldY + Math.min(sampleSize, map.worldY + map.worldHeight - worldY) / 2
-        };
-        if (this.#isWorldPointVisible(point)) continue;
-
-        const mapX = this.#worldToMapX(map, worldX);
-        const mapY = this.#worldToMapY(map, worldY);
-        const mapX2 = this.#worldToMapX(map, Math.min(worldX + sampleSize, map.worldX + map.worldWidth));
-        const mapY2 = this.#worldToMapY(map, Math.min(worldY + sampleSize, map.worldY + map.worldHeight));
-        context.fillRect(mapX, mapY, mapX2 - mapX, mapY2 - mapY);
-      }
-    }
+    context.fillRect(map.x, map.y, map.width, map.height);
     context.restore();
+  }
+
+  #invalidateFogMask() {
+    this.#fogMaskDirty = true;
+    this.#fogMaskSignature = "";
+    this.#cancelFogBuild();
+  }
+
+  #getFogSampleGrid(map, dimensions) {
+    const gridSize = Math.max(32, Number(dimensions.size) || 100);
+    return {
+      columns: Math.min(FOG_MAX_SAMPLES, Math.max(1, Math.ceil(map.worldWidth / gridSize))),
+      rows: Math.min(FOG_MAX_SAMPLES, Math.max(1, Math.ceil(map.worldHeight / gridSize)))
+    };
+  }
+
+  #getFogMaskSignature(dimensions, scene, map) {
+    const {columns, rows} = this.#getFogSampleGrid(map, dimensions);
+    const levelId = globalThis.canvas?.level?.id ?? "default-level";
+    const fogMode = scene?.fog?.mode ?? "unknown-fog";
+    return [
+      scene?.id ?? "unknown-scene",
+      levelId,
+      map.worldX,
+      map.worldY,
+      map.worldWidth,
+      map.worldHeight,
+      scene?.tokenVision !== false,
+      fogMode,
+      `${columns}x${rows}`
+    ].join(":");
+  }
+
+  #startFogMaskBuild() {
+    const dimensions = globalThis.canvas?.dimensions;
+    const scene = globalThis.canvas?.scene;
+    const map = dimensions && scene ? this.#getMapBounds(dimensions, scene) : null;
+    if (!this.#mapCanvas || !dimensions || !scene || !map || game.user?.isGM || !this.#hasFogOfWar(scene)) {
+      this.#cancelFogBuild();
+      this.#fogMaskCanvas = null;
+      this.#fogMaskSignature = "";
+      this.#fogMaskDirty = false;
+      return;
+    }
+
+    const signature = this.#getFogMaskSignature(dimensions, scene, map);
+    if (this.#fogBuild?.signature === signature) return;
+    if (!this.#fogMaskDirty && this.#fogMaskSignature === signature) return;
+
+    this.#cancelFogBuild();
+    const {columns, rows} = this.#getFogSampleGrid(map, dimensions);
+    const maskCanvas = this.#mapCanvas.ownerDocument.createElement("canvas");
+    maskCanvas.width = columns;
+    maskCanvas.height = rows;
+    const maskContext = maskCanvas.getContext("2d");
+    maskContext.clearRect(0, 0, columns, rows);
+
+    const build = {
+      generation: this.#fogBuildGeneration,
+      signature,
+      map,
+      canvas: maskCanvas,
+      context: maskContext,
+      columns,
+      rows,
+      nextRow: 0
+    };
+    this.#fogBuild = build;
+    this.#processFogMaskBuild(build);
+  }
+
+  #processFogMaskBuild(build) {
+    if (this.#fogBuild !== build || build.generation !== this.#fogBuildGeneration) return;
+
+    const row = build.nextRow++;
+    const cellWidth = build.map.worldWidth / build.columns;
+    const cellHeight = build.map.worldHeight / build.rows;
+    build.context.fillStyle = "rgb(0 0 0 / 94%)";
+    for (let column = 0; column < build.columns; column += 1) {
+      const point = {
+        x: build.map.worldX + (column + 0.5) * cellWidth,
+        y: build.map.worldY + (row + 0.5) * cellHeight
+      };
+      if (!this.#isWorldPointVisible(point)) build.context.fillRect(column, row, 1, 1);
+    }
+
+    if (build.nextRow >= build.rows) {
+      this.#fogMaskCanvas = build.canvas;
+      this.#fogMaskSignature = build.signature;
+      this.#fogMaskDirty = false;
+      this.#fogBuild = null;
+      this.#draw();
+      return;
+    }
+
+    this.#fogBuildTimer = setTimeout(() => {
+      this.#fogBuildTimer = null;
+      this.#processFogMaskBuild(build);
+    }, 0);
   }
 
   #drawTokens(context, scene, map) {
@@ -1007,6 +1171,11 @@ function handleWorldSettingChange(key, value) {
     return;
   }
 
+  if (key === SETTINGS.PERFORMANCE_OPTIMIZATION) {
+    for (const minimap of MelMinimap._instances) minimap.applyPerformanceOptimizationSetting(value);
+    return;
+  }
+
   if (key === SETTINGS.SHOW_BACKGROUND || key === SETTINGS.SHOW_MAP_NOTES) {
     for (const minimap of MelMinimap._instances) minimap.redraw();
   }
@@ -1069,6 +1238,16 @@ Hooks.once("init", () => {
     type: Boolean,
     default: DEFAULT_DYNAMIC_SIZE,
     onChange: value => handleWorldSettingChange(SETTINGS.DYNAMIC_SIZE, value)
+  });
+
+  game.settings.register(MODULE_ID, PERFORMANCE_OPTIMIZATION_SETTING, {
+    name: "MEL_MINIMAP.PerformanceOptimization",
+    hint: "MEL_MINIMAP.PerformanceOptimizationHint",
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: DEFAULT_PERFORMANCE_OPTIMIZATION,
+    onChange: value => handleWorldSettingChange(SETTINGS.PERFORMANCE_OPTIMIZATION, value)
   });
 
   game.settings.register(MODULE_ID, SETTINGS_MIGRATION_SETTING, {
@@ -1158,6 +1337,9 @@ for (const hook of [
       // Application DOM. Re-rendering during canvasPan caused unstable
       // content metrics and progressive distortion after minimap clicks.
       if (hook === "canvasReady" || hook === "updateScene") void minimap.render();
+      else if (hook === "visibilityRefresh" || hook === "sightRefresh" || hook === "updateFogExploration") {
+        minimap.requestFogRefresh();
+      }
       else minimap.redraw();
     }
   });

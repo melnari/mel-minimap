@@ -4,7 +4,7 @@ Mel-Minimap is a Foundry Virtual Tabletop module that displays the complete acti
 
 ## Compatibility
 
-- Module version: `1.1.1`
+- Module version: `1.1.2`
 - Foundry Virtual Tabletop: `14.x`
 - Verified with Foundry Virtual Tabletop `14.369`
 
@@ -85,8 +85,9 @@ Mel-Minimap settings are world settings. The GM configures them in Foundry's mod
 - **Show map background**: Displays the active Scene background in the minimap. Enabled by default.
 - **Show Map Notes**: Displays visible Map Note markers and enables Map Note hover actions. Disabled by default.
 - **Enable dynamic minimap size**: Enables manual resizing in the attached and detached windows. The automatic 10% scale, 300-pixel minimum where possible, and 350-pixel maximum remain the initial sizing defaults. Enabled by default for new worlds.
+- **Performance optimization for large maps**: Debounces expensive Fog of War rebuilds. Disabled by default; enabled mode uses a 500 ms debounce and disabled mode uses 250 ms.
 
-Changing **Show Map Notes**, **Show map background**, or **Enable dynamic minimap size** updates open minimaps for all connected users. Changing **Open minimap when the world starts** synchronizes the current minimap visibility and is also used at the next world startup.
+Changing **Show Map Notes**, **Show map background**, **Enable dynamic minimap size**, or **Performance optimization for large maps** updates open minimaps for all connected users. Changing **Open minimap when the world starts** synchronizes the current minimap visibility and is also used at the next world startup.
 
 ## Usage
 
@@ -128,7 +129,7 @@ Mel-Minimap follows Foundry's current Scene visibility state for non-GM users:
 - GMs can see content that is hidden from players; hidden Token markers use reduced opacity.
 - If the Scene's **Token Vision** setting is disabled, players see the complete map regardless of **Exploration Mode**.
 
-The Fog of War mask is sampled across the map for performance. Lighting, weather, animated effects, and video animation are not reproduced as a separate full Scene render.
+The Fog of War mask is sampled across the map at a bounded resolution and cached between visibility changes. Expensive rebuilds are debounced according to **Performance optimization for large maps**. Lighting, weather, animated effects, and video animation are not reproduced as a separate full Scene render.
 
 ## Localization
 
@@ -148,6 +149,8 @@ The main localization keys include:
 - `MEL_MINIMAP.AutoOpen`
 - `MEL_MINIMAP.ShowBackground`
 - `MEL_MINIMAP.ShowMapNotes`
+- `MEL_MINIMAP.DynamicSize`
+- `MEL_MINIMAP.PerformanceOptimization`
 - `MEL_MINIMAP.Legend.Party`
 - `MEL_MINIMAP.Legend.Neutral`
 - `MEL_MINIMAP.Legend.Opposition`
@@ -164,10 +167,12 @@ mel-minimap/
 │   ├── minimap.js
 │   ├── actor-sheet.mjs
 │   ├── keybindings.mjs
-│   └── map-note.mjs
+│   ├── map-note.mjs
+│   └── minimap-settings.mjs
 ├── tests/
 │   ├── actor-sheet.test.mjs
-│   └── map-note.test.mjs
+│   ├── map-note.test.mjs
+│   └── minimap-settings.test.mjs
 └── styles/minimap.css
 ```
 

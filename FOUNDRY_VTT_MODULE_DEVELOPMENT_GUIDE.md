@@ -335,6 +335,17 @@ Define how a map-related feature handles Token Vision and Exploration Mode:
 
 Use current Foundry perception and fog APIs for the target core version. Do not treat a client-side opacity mask as a permission system. Safe default: do not reveal unexplored map areas, hidden placeables, private text, or private artwork to users who could not see them in the normal Foundry view.
 
+For expensive minimap fog calculations, avoid a full-scene rebuild on every
+animation frame. Cache the sampled mask, invalidate it only after relevant
+visibility changes, and debounce rebuild requests. A shared performance setting
+may select a longer delay for large maps, but lightweight token and viewport
+updates should remain immediate. If the rebuild itself is expensive, process it
+in small asynchronous slices so the main UI remains responsive.
+
+For the Mel-Minimap performance setting, the default is disabled: new worlds use
+the 250 ms debounce unless the GM enables **Performance optimization for large
+maps**, which changes the delay to 500 ms.
+
 If a setting intentionally changes this behavior, make it explicit, localize its warning text, define its default, and state whether it affects one client or the entire world.
 
 ## 12. Settings and keybindings
@@ -430,7 +441,7 @@ Use the project's package manager and lockfile when a test runner or build tool 
 
 ### 15.2 Recommended coverage
 
-Test manifest parsing and version consistency, localization completeness, setting defaults and migrations, runtime setting mode changes, keybinding guards, permissions, missing documents/assets, coordinate conversion, pointer bounds, aspect-ratio preservation, minimum and maximum display sizes, dynamic resize behavior, empty and unusual dimensions, fog/perception transitions, and cleanup after close, scene change, and repeated initialization.
+Test manifest parsing and version consistency, localization completeness, setting defaults and migrations, runtime setting mode changes, keybinding guards, permissions, missing documents/assets, coordinate conversion, pointer bounds, aspect-ratio preservation, minimum and maximum display sizes, dynamic resize behavior, fog-cache invalidation, debounce timing, bounded sampling, asynchronous rebuild slices, empty and unusual dimensions, fog/perception transitions, and cleanup after close, scene change, and repeated initialization.
 
 ### 15.3 Manual Foundry matrix
 
