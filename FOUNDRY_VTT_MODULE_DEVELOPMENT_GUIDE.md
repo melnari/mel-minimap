@@ -9,7 +9,7 @@ It intentionally contains no feature decisions for a specific module. Replace th
 - `<repository-name>`: the repository name
 - `<system-id>`: an optional system identifier
 
-The examples target the Foundry VTT 14 API family and use `14.369` as the current verified-build example. Always verify the exact target build and current API documentation before release.
+The examples target the Foundry VTT 14 API family and use `14.370` as the current verified-build example. Always verify the exact target build and current API documentation before release.
 
 ## 1. Foundry package fundamentals
 
@@ -100,7 +100,7 @@ Replace every placeholder and remove fields that do not apply:
   "version": "1.0.0",
   "compatibility": {
     "minimum": "14",
-    "verified": "14.369"
+    "verified": "14.370"
   },
   "authors": [
     {

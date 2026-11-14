@@ -4,9 +4,9 @@ Mel-Minimap is a Foundry Virtual Tabletop module that displays the complete acti
 
 ## Compatibility
 
-- Module version: `1.1.2`
+- Module version: `1.1.3`
 - Foundry Virtual Tabletop: `14.x`
-- Verified with Foundry Virtual Tabletop `14.369`
+- Verified with Foundry Virtual Tabletop `14.370`
 
 ## Features
 
