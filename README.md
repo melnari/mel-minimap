@@ -4,7 +4,7 @@ Mel-Minimap is a Foundry Virtual Tabletop module that displays the complete acti
 
 ## Compatibility
 
-- Module version: `1.1.3`
+- Module version: `1.1.4`
 - Foundry Virtual Tabletop: `14.x`
 - Verified with Foundry Virtual Tabletop `14.370`
 
@@ -129,7 +129,7 @@ Mel-Minimap follows Foundry's current Scene visibility state for non-GM users:
 - GMs can see content that is hidden from players; hidden Token markers use reduced opacity.
 - If the Scene's **Token Vision** setting is disabled, players see the complete map regardless of **Exploration Mode**.
 
-The Fog of War mask is sampled across the map at a bounded resolution and cached between visibility changes. Expensive rebuilds are debounced according to **Performance optimization for large maps**. Lighting, weather, animated effects, and video animation are not reproduced as a separate full Scene render.
+The Fog of War mask is sampled across the map at a bounded resolution and cached between visibility changes. Unexplored areas are covered by a fully opaque mask, while explored areas remain visible. Expensive rebuilds are debounced according to **Performance optimization for large maps**. Lighting, weather, animated effects, and video animation are not reproduced as a separate full Scene render.
 
 ## Localization
 

@@ -588,7 +588,12 @@ class MelMinimap extends ApplicationV2 {
 
     const signature = this.#getFogMaskSignature(dimensions, scene, map);
     if (this.#fogMaskCanvas && !this.#fogMaskDirty && this.#fogMaskSignature === signature) {
+      context.save();
+      // Keep unexplored cells fully opaque when the bounded mask is enlarged.
+      // Interpolation would create partially transparent boundary pixels.
+      context.imageSmoothingEnabled = false;
       context.drawImage(this.#fogMaskCanvas, map.x, map.y, map.width, map.height);
+      context.restore();
       return;
     }
 
@@ -597,7 +602,7 @@ class MelMinimap extends ApplicationV2 {
     // while keeping the expensive work outside the synchronous draw call.
     if (!this.#fogBuild && !this.#fogRefreshTimer) this.#startFogMaskBuild();
     context.save();
-    context.fillStyle = "rgb(0 0 0 / 94%)";
+    context.fillStyle = "#000000";
     context.fillRect(map.x, map.y, map.width, map.height);
     context.restore();
   }
@@ -677,7 +682,7 @@ class MelMinimap extends ApplicationV2 {
     const row = build.nextRow++;
     const cellWidth = build.map.worldWidth / build.columns;
     const cellHeight = build.map.worldHeight / build.rows;
-    build.context.fillStyle = "rgb(0 0 0 / 94%)";
+    build.context.fillStyle = "#000000";
     for (let column = 0; column < build.columns; column += 1) {
       const point = {
         x: build.map.worldX + (column + 0.5) * cellWidth,

@@ -112,3 +112,10 @@ test("all user-facing minimap settings are registered as world settings", () => 
   assert.match(source, /FOG_MAX_SAMPLES/);
   assert.doesNotMatch(source, /#startRefreshLoop/);
 });
+
+test("Fog of War occlusion is fully opaque and scaled without interpolation", () => {
+  const source = fs.readFileSync(new URL("../scripts/minimap.js", import.meta.url), "utf8");
+  assert.equal((source.match(/fillStyle = \"#000000\"/g) ?? []).length, 2);
+  assert.doesNotMatch(source, /rgb\(0 0 0 \/ 94%\)/);
+  assert.match(source, /imageSmoothingEnabled\s*=\s*false/);
+});
