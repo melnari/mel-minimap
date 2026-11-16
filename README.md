@@ -197,3 +197,9 @@ See [LICENSE](LICENSE).
 ## AI Usage Declaration
 
 Parts of this module were created with AI assistance. The maintainer reviews, tests, maintains, develops, and supports the code and is responsible for its quality, compatibility and continued development.
+
+## FAQ
+
+### Why can a Party token disappear when I select my character?
+
+Mel-Minimap follows Foundry's standard Token Vision rules. When no Token is selected, Foundry may combine vision from eligible Tokens; selecting a Token can limit visibility to that Token's vision. The Party disposition affects the marker color only and does not override Foundry visibility rules. See the [Foundry Token Vision documentation](https://foundryvtt.com/article/tokens/).
