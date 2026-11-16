@@ -109,6 +109,8 @@ test("all user-facing minimap settings are registered as world settings", () => 
   assert.match(source, /migrateLegacyClientSettings/);
   assert.match(source, /readLegacyClientSetting/);
   assert.match(source, /requestFogRefresh/);
+  assert.match(source, /#invalidateFogMask\(\{preserveCache: true\}\)/);
+  assert.match(source, /if \(!this\.#isWorldPointExplored\(point\)\) build\.context\.fillRect/);
   assert.match(source, /FOG_MAX_SAMPLES/);
   assert.doesNotMatch(source, /#startRefreshLoop/);
 });

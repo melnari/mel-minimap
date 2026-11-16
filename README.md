@@ -121,9 +121,9 @@ When **Enable dynamic minimap size** is active, resize the window using Foundry'
 
 Mel-Minimap follows Foundry's current Scene visibility state for non-GM users:
 
-- Unexplored or currently invisible areas are masked.
+- Unexplored areas are masked; explored map areas remain visible, including areas revealed through Shared Fog of War.
 - Tokens inside masked areas are not displayed.
-- Hidden or otherwise invisible Tokens are not displayed to players.
+- Hidden or otherwise invisible Tokens are not displayed to players, even when the surrounding map area has been explored.
 - Non-global Map Notes in unexplored or currently invisible areas are not displayed to players.
 - Global Map Notes follow Foundry's global visibility behavior.
 - GMs can see content that is hidden from players; hidden Token markers use reduced opacity.

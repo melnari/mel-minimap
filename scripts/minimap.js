@@ -251,7 +251,9 @@ class MelMinimap extends ApplicationV2 {
   }
 
   requestFogRefresh({immediate=false} = {}) {
-    this.#invalidateFogMask();
+    // Keep the last completed mask visible while the next one is debounced and
+    // rebuilt. This prevents movement and sight updates from blanking the map.
+    this.#invalidateFogMask({preserveCache: true});
     this.#queueFogRefresh({immediate});
     this.#draw();
   }
@@ -587,7 +589,7 @@ class MelMinimap extends ApplicationV2 {
     if (game.user?.isGM || !this.#hasFogOfWar(scene)) return;
 
     const signature = this.#getFogMaskSignature(dimensions, scene, map);
-    if (this.#fogMaskCanvas && !this.#fogMaskDirty && this.#fogMaskSignature === signature) {
+    if (this.#fogMaskCanvas && this.#fogMaskSignature === signature) {
       context.save();
       // Keep unexplored cells fully opaque when the bounded mask is enlarged.
       // Interpolation would create partially transparent boundary pixels.
@@ -597,9 +599,9 @@ class MelMinimap extends ApplicationV2 {
       return;
     }
 
-    // A pending or in-progress rebuild masks the complete map until the new
-    // visibility result is available. This avoids revealing newly hidden areas
-    // while keeping the expensive work outside the synchronous draw call.
+    // A pending or in-progress rebuild masks the complete map only when no
+    // matching completed mask exists yet. Existing masks remain visible during
+    // debounced refreshes so movement does not blank the minimap.
     if (!this.#fogBuild && !this.#fogRefreshTimer) this.#startFogMaskBuild();
     context.save();
     context.fillStyle = "#000000";
@@ -607,9 +609,12 @@ class MelMinimap extends ApplicationV2 {
     context.restore();
   }
 
-  #invalidateFogMask() {
+  #invalidateFogMask({preserveCache=false} = {}) {
     this.#fogMaskDirty = true;
-    this.#fogMaskSignature = "";
+    if (!preserveCache) {
+      this.#fogMaskCanvas = null;
+      this.#fogMaskSignature = "";
+    }
     this.#cancelFogBuild();
   }
 
@@ -688,7 +693,7 @@ class MelMinimap extends ApplicationV2 {
         x: build.map.worldX + (column + 0.5) * cellWidth,
         y: build.map.worldY + (row + 0.5) * cellHeight
       };
-      if (!this.#isWorldPointVisible(point)) build.context.fillRect(column, row, 1, 1);
+      if (!this.#isWorldPointExplored(point)) build.context.fillRect(column, row, 1, 1);
     }
 
     if (build.nextRow >= build.rows) {
@@ -1013,11 +1018,9 @@ class MelMinimap extends ApplicationV2 {
     return Boolean(fog?.fogExploration || fog?.exploration);
   }
 
-  #isWorldPointVisible(point) {
+  #isWorldPointExplored(point) {
     const fog = globalThis.canvas?.fog;
-    const visibility = globalThis.canvas?.visibility;
     let explored = true;
-    let visible = true;
 
     try {
       if (typeof fog?.isPointExplored === "function") explored = Boolean(fog.isPointExplored(point));
@@ -1025,13 +1028,24 @@ class MelMinimap extends ApplicationV2 {
       console.warn(`${MODULE_ID} could not query fog exploration`, error);
     }
 
+    return explored;
+  }
+
+  #isWorldPointCurrentlyVisible(point) {
+    const visibility = globalThis.canvas?.visibility;
+    let visible = true;
+
     try {
       if (typeof visibility?.testVisibility === "function") visible = Boolean(visibility.testVisibility(point));
     } catch (error) {
-      console.warn(`${MODULE_ID} could not query canvas visibility`, error);
+      console.warn(`${MODULE_ID} could not query current canvas visibility`, error);
     }
 
-    return explored && visible;
+    return visible;
+  }
+
+  #isWorldPointVisible(point) {
+    return this.#isWorldPointExplored(point) && this.#isWorldPointCurrentlyVisible(point);
   }
 
   #drawViewport(context, map, toMapX, toMapY, width, height) {
