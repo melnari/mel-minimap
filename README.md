@@ -4,7 +4,7 @@ Mel-Minimap is a Foundry Virtual Tabletop module that displays the complete acti
 
 ## Compatibility
 
-- Module version: `1.1.5`
+- Module version: `1.1.3`
 - Foundry Virtual Tabletop: `14.x`
 - Verified with Foundry Virtual Tabletop `14.370`
 
@@ -121,15 +121,15 @@ When **Enable dynamic minimap size** is active, resize the window using Foundry'
 
 Mel-Minimap follows Foundry's current Scene visibility state for non-GM users:
 
-- Unexplored areas are masked; explored map areas remain visible, including areas revealed through Shared Fog of War.
+- Unexplored or currently invisible areas are masked.
 - Tokens inside masked areas are not displayed.
-- Hidden or otherwise invisible Tokens are not displayed to players, even when the surrounding map area has been explored.
+- Hidden or otherwise invisible Tokens are not displayed to players.
 - Non-global Map Notes in unexplored or currently invisible areas are not displayed to players.
 - Global Map Notes follow Foundry's global visibility behavior.
 - GMs can see content that is hidden from players; hidden Token markers use reduced opacity.
 - If the Scene's **Token Vision** setting is disabled, players see the complete map regardless of **Exploration Mode**.
 
-The Fog of War mask is sampled across the map at a bounded resolution and cached between visibility changes. Unexplored areas are covered by a fully opaque mask, while explored areas remain visible. Expensive rebuilds are debounced according to **Performance optimization for large maps**. Lighting, weather, animated effects, and video animation are not reproduced as a separate full Scene render.
+The Fog of War mask is sampled across the map at a bounded resolution and cached between visibility changes. Expensive rebuilds are debounced according to **Performance optimization for large maps**. Lighting, weather, animated effects, and video animation are not reproduced as a separate full Scene render.
 
 ## Localization
 
@@ -197,9 +197,3 @@ See [LICENSE](LICENSE).
 ## AI Usage Declaration
 
 Parts of this module were created with AI assistance. The maintainer reviews, tests, maintains, develops, and supports the code and is responsible for its quality, compatibility and continued development.
-
-## FAQ
-
-### Why can a Party token disappear when I select my character?
-
-Mel-Minimap follows Foundry's standard Token Vision rules. When no Token is selected, Foundry may combine vision from eligible Tokens; selecting a Token can limit visibility to that Token's vision. The Party disposition affects the marker color only and does not override Foundry visibility rules. See the [Foundry Token Vision documentation](https://foundryvtt.com/article/tokens/).
