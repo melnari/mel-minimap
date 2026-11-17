@@ -82,12 +82,13 @@ The installed folder must be named `mel-minimap`, matching the module ID in `mod
 Mel-Minimap settings are world settings. The GM configures them in Foundry's module settings, and the same values apply to every connected player. Players cannot override these settings with browser-local values. On the first update from an earlier release, the current GM values are migrated to the world settings.
 
 - **Open minimap when the world starts**: Opens the minimap automatically after the World is ready. Enabled by default.
-- **Show map background**: Displays the active Scene background in the minimap. Enabled by default.
+- **Show map background**: Displays the currently viewed Level's background and optional foreground texture in the minimap. Enabled by default.
 - **Show Map Notes**: Displays visible Map Note markers and enables Map Note hover actions. Disabled by default.
 - **Enable dynamic minimap size**: Enables manual resizing in the attached and detached windows. The automatic 10% scale, 300-pixel minimum where possible, and 350-pixel maximum remain the initial sizing defaults. Enabled by default for new worlds.
 - **Performance optimization for large maps**: Debounces expensive Fog of War rebuilds. Disabled by default; enabled mode uses a 500 ms debounce and disabled mode uses 250 ms.
+- **Explored Area Visibility**: Sets how much of an explored but currently invisible area remains visible in the minimap. The value is an integer from 0 to 100 percent and defaults to 60 percent.
 
-Changing **Show Map Notes**, **Show map background**, **Enable dynamic minimap size**, or **Performance optimization for large maps** updates open minimaps for all connected users. Changing **Open minimap when the world starts** synchronizes the current minimap visibility and is also used at the next world startup.
+Changing **Show Map Notes**, **Show map background**, **Enable dynamic minimap size**, **Performance optimization for large maps**, or **Explored Area Visibility** updates open minimaps for all connected users. Changing **Open minimap when the world starts** synchronizes the current minimap visibility and is also used at the next world startup.
 
 ## Usage
 
@@ -121,7 +122,8 @@ When **Enable dynamic minimap size** is active, resize the window using Foundry'
 
 Mel-Minimap follows Foundry's current Scene visibility state for non-GM users:
 
-- Unexplored or currently invisible areas are masked.
+- Unexplored areas are fully blacked out.
+- Explored areas that are not currently visible use **Explored Area Visibility** to determine how much of the map remains visible.
 - Tokens inside masked areas are not displayed.
 - Hidden or otherwise invisible Tokens are not displayed to players.
 - Non-global Map Notes in unexplored or currently invisible areas are not displayed to players.
@@ -129,7 +131,7 @@ Mel-Minimap follows Foundry's current Scene visibility state for non-GM users:
 - GMs can see content that is hidden from players; hidden Token markers use reduced opacity.
 - If the Scene's **Token Vision** setting is disabled, players see the complete map regardless of **Exploration Mode**.
 
-The Fog of War mask is sampled across the map at a bounded resolution and cached between visibility changes. Expensive rebuilds are debounced according to **Performance optimization for large maps**. Lighting, weather, animated effects, and video animation are not reproduced as a separate full Scene render.
+The Fog of War mask is sampled across the map at a bounded resolution and cached between visibility changes. The last completed mask remains visible while a new mask is being debounced and rebuilt, preventing the minimap from turning black during token movement. Expensive rebuilds are debounced according to **Performance optimization for large maps**. Lighting, weather, animated effects, and video animation are not reproduced as a separate full Scene render.
 
 ## Localization
 
@@ -151,6 +153,7 @@ The main localization keys include:
 - `MEL_MINIMAP.ShowMapNotes`
 - `MEL_MINIMAP.DynamicSize`
 - `MEL_MINIMAP.PerformanceOptimization`
+- `MEL_MINIMAP.ExploredAreaVisibility`
 - `MEL_MINIMAP.Legend.Party`
 - `MEL_MINIMAP.Legend.Neutral`
 - `MEL_MINIMAP.Legend.Opposition`

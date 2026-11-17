@@ -342,6 +342,26 @@ may select a longer delay for large maps, but lightweight token and viewport
 updates should remain immediate. If the rebuild itself is expensive, process it
 in small asynchronous slices so the main UI remains responsive.
 
+For Mel-Minimap, represent Fog of War as three states: fully opaque black for
+unexplored areas, a configurable black overlay for explored but currently
+invisible areas, and no overlay for currently visible areas. The shared world
+setting **Explored Area Visibility** controls the percentage of the explored,
+currently invisible map which remains visible; its integer range is 0–100 and
+its default is 60. Do not apply this map opacity rule as a way to reveal
+Tokens or Map Notes: placeables continue to use Foundry's current visibility
+checks.
+
+When a refresh is requested during movement or sight updates, keep the last
+completed mask visible and build the replacement offscreen. Swap the mask only
+after the asynchronous build completes. Use a fully opaque temporary mask only
+when no valid mask exists yet, such as during initial load or a Scene/Level
+change.
+
+For Scene Levels, use only the currently viewed `canvas.level`. Compose its
+optional background and foreground textures before drawing the Fog mask. The
+Level ID and both texture sources belong in the cache signature. Do not depend
+on deprecated Scene background accessors or private level-texture helpers.
+
 For the Mel-Minimap performance setting, the default is disabled: new worlds use
 the 250 ms debounce unless the GM enables **Performance optimization for large
 maps**, which changes the delay to 500 ms.
@@ -441,7 +461,7 @@ Use the project's package manager and lockfile when a test runner or build tool 
 
 ### 15.2 Recommended coverage
 
-Test manifest parsing and version consistency, localization completeness, setting defaults and migrations, runtime setting mode changes, keybinding guards, permissions, missing documents/assets, coordinate conversion, pointer bounds, aspect-ratio preservation, minimum and maximum display sizes, dynamic resize behavior, fog-cache invalidation, debounce timing, bounded sampling, asynchronous rebuild slices, empty and unusual dimensions, fog/perception transitions, and cleanup after close, scene change, and repeated initialization.
+Test manifest parsing and version consistency, localization completeness, setting defaults and migrations, explored-area visibility range and default, runtime setting mode changes, keybinding guards, permissions, missing documents/assets, coordinate conversion, pointer bounds, aspect-ratio preservation, minimum and maximum display sizes, dynamic resize behavior, optional background and foreground textures, active-Level selection, fog-cache invalidation, debounce timing, bounded sampling, asynchronous rebuild slices, empty and unusual dimensions, fog/perception transitions, and cleanup after close, scene change, level change, and repeated initialization.
 
 ### 15.3 Manual Foundry matrix
 

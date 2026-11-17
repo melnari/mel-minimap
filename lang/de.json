@@ -8,6 +8,8 @@
   "MEL_MINIMAP.DynamicSizeHint": "Erlaubt das manuelle Vergrößern und Verkleinern der Minimap bei gleichbleibendem Seitenverhältnis.",
   "MEL_MINIMAP.PerformanceOptimization": "Performance-Optimierung für große Karten",
   "MEL_MINIMAP.PerformanceOptimizationHint": "Reduziert die Häufigkeit aufwendiger Fog-of-War-Aktualisierungen, um die Performance bei großen Szenen zu verbessern.",
+  "MEL_MINIMAP.ExploredAreaVisibility": "Sichtbarkeit erforschter Bereiche",
+  "MEL_MINIMAP.ExploredAreaVisibilityHint": "Legt fest, wie viel Prozent eines erforschten Bereichs sichtbar bleiben, wenn ihn aktuell kein verbündeter Token sehen kann (0–100 %).",
   "MEL_MINIMAP.NoScene": "Keine aktive Scene",
   "MEL_MINIMAP.NoCanvas": "Canvas ist noch nicht bereit",
   "MEL_MINIMAP.Legend.Party": "Verbündet",

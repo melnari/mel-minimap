@@ -3,7 +3,8 @@ export const SETTINGS = Object.freeze({
   SHOW_BACKGROUND: "showBackground",
   SHOW_MAP_NOTES: "showMapNotes",
   DYNAMIC_SIZE: "dynamicSize",
-  PERFORMANCE_OPTIMIZATION: "performanceOptimization"
+  PERFORMANCE_OPTIMIZATION: "performanceOptimization",
+  EXPLORED_AREA_VISIBILITY: "exploredAreaVisibility"
 });
 
 export const DEFAULT_SETTINGS = Object.freeze({
@@ -11,13 +12,16 @@ export const DEFAULT_SETTINGS = Object.freeze({
   [SETTINGS.SHOW_BACKGROUND]: true,
   [SETTINGS.SHOW_MAP_NOTES]: false,
   [SETTINGS.DYNAMIC_SIZE]: true,
-  [SETTINGS.PERFORMANCE_OPTIMIZATION]: false
+  [SETTINGS.PERFORMANCE_OPTIMIZATION]: false,
+  [SETTINGS.EXPLORED_AREA_VISIBILITY]: 60
 });
 
 export const DYNAMIC_SIZE_SETTING = SETTINGS.DYNAMIC_SIZE;
 export const DEFAULT_DYNAMIC_SIZE = DEFAULT_SETTINGS[DYNAMIC_SIZE_SETTING];
 export const PERFORMANCE_OPTIMIZATION_SETTING = SETTINGS.PERFORMANCE_OPTIMIZATION;
 export const DEFAULT_PERFORMANCE_OPTIMIZATION = DEFAULT_SETTINGS[PERFORMANCE_OPTIMIZATION_SETTING];
+export const EXPLORED_AREA_VISIBILITY_SETTING = SETTINGS.EXPLORED_AREA_VISIBILITY;
+export const DEFAULT_EXPLORED_AREA_VISIBILITY = DEFAULT_SETTINGS[EXPLORED_AREA_VISIBILITY_SETTING];
 export const FOG_DEBOUNCE_OPTIMIZED_MS = 500;
 export const FOG_DEBOUNCE_RESPONSIVE_MS = 250;
 export const SETTINGS_MIGRATION_SETTING = "settingsMigration";
@@ -64,4 +68,26 @@ export function isPerformanceOptimizationEnabled(settings = globalThis.game?.set
 /** Select the debounce delay used for expensive Fog of War rebuilds. */
 export function getFogDebounceDelay(optimized) {
   return optimized ? FOG_DEBOUNCE_OPTIMIZED_MS : FOG_DEBOUNCE_RESPONSIVE_MS;
+}
+
+/** Clamp the explored-area visibility to the integer range exposed in settings. */
+export function normalizeExploredAreaVisibility(value, fallback = DEFAULT_EXPLORED_AREA_VISIBILITY) {
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) return fallback;
+  return Math.min(100, Math.max(0, Math.round(numericValue)));
+}
+
+/** Read the shared explored-area visibility setting safely. */
+export function getExploredAreaVisibility(settings = globalThis.game?.settings) {
+  try {
+    const value = settings?.get?.("mel-minimap", EXPLORED_AREA_VISIBILITY_SETTING);
+    return normalizeExploredAreaVisibility(value);
+  } catch {
+    return DEFAULT_EXPLORED_AREA_VISIBILITY;
+  }
+}
+
+/** Convert visible explored-area percentage to black-mask alpha. */
+export function getExploredHiddenMaskAlpha(visibility) {
+  return 1 - normalizeExploredAreaVisibility(visibility) / 100;
 }

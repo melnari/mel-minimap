@@ -18,9 +18,14 @@ import {
   DEFAULT_SETTINGS,
   DYNAMIC_SIZE_SETTING,
   DEFAULT_DYNAMIC_SIZE,
+  DEFAULT_EXPLORED_AREA_VISIBILITY,
   DEFAULT_PERFORMANCE_OPTIMIZATION,
+  EXPLORED_AREA_VISIBILITY_SETTING,
   getFogDebounceDelay,
+  getExploredAreaVisibility,
+  getExploredHiddenMaskAlpha,
   isPerformanceOptimizationEnabled,
+  normalizeExploredAreaVisibility,
   PERFORMANCE_OPTIMIZATION_SETTING,
   readLegacyClientSetting,
   SETTINGS,
@@ -90,6 +95,7 @@ class MelMinimap extends ApplicationV2 {
   #hoveredNote = null;
   #pointerPosition = null;
   #performanceOptimization = DEFAULT_PERFORMANCE_OPTIMIZATION;
+  #exploredAreaVisibility = DEFAULT_EXPLORED_AREA_VISIBILITY;
   #fogRefreshTimer = null;
   #fogBuildTimer = null;
   #fogBuild = null;
@@ -102,6 +108,7 @@ class MelMinimap extends ApplicationV2 {
     super(options);
     this.#dynamicSize = isDynamicSizeEnabled();
     this.#performanceOptimization = isPerformanceOptimizationEnabled();
+    this.#exploredAreaVisibility = getExploredAreaVisibility();
     MelMinimap._instances.add(this);
   }
 
@@ -131,6 +138,14 @@ class MelMinimap extends ApplicationV2 {
     if (this.#fogRefreshTimer) {
       this.#queueFogRefresh();
     }
+  }
+
+  /** Apply the shared explored-area visibility setting to an open minimap. */
+  applyExploredAreaVisibilitySetting(value) {
+    const visibility = normalizeExploredAreaVisibility(value);
+    if (this.#exploredAreaVisibility === visibility) return;
+    this.#exploredAreaVisibility = visibility;
+    this.requestFogRefresh({immediate: true});
   }
 
   async _renderHTML() {
@@ -251,7 +266,9 @@ class MelMinimap extends ApplicationV2 {
   }
 
   requestFogRefresh({immediate=false} = {}) {
-    this.#invalidateFogMask();
+    // Keep the last completed mask visible while the next one is debounced and
+    // rebuilt. This prevents movement and sight updates from blanking the map.
+    this.#invalidateFogMask({preserveCache: true});
     this.#queueFogRefresh({immediate});
     this.#draw();
   }
@@ -380,10 +397,17 @@ class MelMinimap extends ApplicationV2 {
     const level = globalThis.canvas?.level
       ?? scene?.levels?.get?.(scene?.initialLevel)
       ?? scene?.firstLevel;
-    const source = level?.background?.src ?? null;
-    const image = source ? this.#getImage(source) : null;
-    const width = image?.naturalWidth || sceneRect.width;
-    const height = image?.naturalHeight || sceneRect.height;
+    const backgroundSource = level?.background?.src ?? null;
+    const foregroundSource = level?.foreground?.src ?? null;
+    const backgroundImage = backgroundSource ? this.#getImage(backgroundSource) : null;
+    const foregroundImage = foregroundSource ? this.#getImage(foregroundSource) : null;
+    const sourceImage = backgroundImage?.naturalWidth
+      ? backgroundImage
+      : foregroundImage?.naturalWidth
+        ? foregroundImage
+        : null;
+    const width = sourceImage?.naturalWidth || sceneRect.width;
+    const height = sourceImage?.naturalHeight || sceneRect.height;
     return {
       x: 0,
       y: 0,
@@ -393,8 +417,11 @@ class MelMinimap extends ApplicationV2 {
       worldY: sceneRect.y,
       worldWidth: sceneRect.width,
       worldHeight: sceneRect.height,
-      source,
-      image
+      levelId: level?.id ?? "default-level",
+      backgroundSource,
+      foregroundSource,
+      backgroundImage,
+      foregroundImage
     };
   }
 
@@ -406,7 +433,7 @@ class MelMinimap extends ApplicationV2 {
     }
 
     const sceneId = globalThis.canvas?.scene?.id ?? "unknown-scene";
-    const signature = `${sceneId}:${map.source ?? ""}:${map.width}:${map.height}`;
+    const signature = `${sceneId}:${map.levelId}:${map.backgroundSource ?? ""}:${map.foregroundSource ?? ""}:${map.width}:${map.height}`;
 
     const frame = this.element;
     const content = this.window?.content;
@@ -543,20 +570,18 @@ class MelMinimap extends ApplicationV2 {
       return;
     }
 
-    const source = map.source;
-    if (!source) {
-      context.fillStyle = "#232323";
-      context.fillRect(map.x, map.y, map.width, map.height);
-      return;
+    context.fillStyle = "#232323";
+    context.fillRect(map.x, map.y, map.width, map.height);
+
+    let drewTexture = false;
+    for (const image of [map.backgroundImage, map.foregroundImage]) {
+      if (!image?.complete || !image.naturalWidth) continue;
+      context.drawImage(image, map.x, map.y, map.width, map.height);
+      drewTexture = true;
     }
 
-    const image = map.image ?? this.#getImage(source);
-    if (image?.complete && image.naturalWidth) {
-      context.drawImage(image, map.x, map.y, map.width, map.height);
+    if (drewTexture) {
       context.fillStyle = "rgb(0 0 0 / 16%)";
-      context.fillRect(map.x, map.y, map.width, map.height);
-    } else {
-      context.fillStyle = "#232323";
       context.fillRect(map.x, map.y, map.width, map.height);
     }
   }
@@ -587,24 +612,31 @@ class MelMinimap extends ApplicationV2 {
     if (game.user?.isGM || !this.#hasFogOfWar(scene)) return;
 
     const signature = this.#getFogMaskSignature(dimensions, scene, map);
-    if (this.#fogMaskCanvas && !this.#fogMaskDirty && this.#fogMaskSignature === signature) {
+    if (this.#fogMaskCanvas && this.#fogMaskSignature === signature) {
+      context.save();
+      // Preserve hard opaque unexplored cells when the bounded mask is scaled.
+      context.imageSmoothingEnabled = false;
       context.drawImage(this.#fogMaskCanvas, map.x, map.y, map.width, map.height);
+      context.restore();
       return;
     }
 
-    // A pending or in-progress rebuild masks the complete map until the new
-    // visibility result is available. This avoids revealing newly hidden areas
-    // while keeping the expensive work outside the synchronous draw call.
+    // A pending or in-progress rebuild masks the complete map only when no
+    // matching completed mask exists yet. Existing masks remain visible during
+    // debounced refreshes so movement does not blank the minimap.
     if (!this.#fogBuild && !this.#fogRefreshTimer) this.#startFogMaskBuild();
     context.save();
-    context.fillStyle = "rgb(0 0 0 / 94%)";
+    context.fillStyle = "#000000";
     context.fillRect(map.x, map.y, map.width, map.height);
     context.restore();
   }
 
-  #invalidateFogMask() {
+  #invalidateFogMask({preserveCache=false} = {}) {
     this.#fogMaskDirty = true;
-    this.#fogMaskSignature = "";
+    if (!preserveCache) {
+      this.#fogMaskCanvas = null;
+      this.#fogMaskSignature = "";
+    }
     this.#cancelFogBuild();
   }
 
@@ -629,6 +661,8 @@ class MelMinimap extends ApplicationV2 {
       map.worldHeight,
       scene?.tokenVision !== false,
       fogMode,
+      map.backgroundSource ?? "",
+      map.foregroundSource ?? "",
       `${columns}x${rows}`
     ].join(":");
   }
@@ -677,13 +711,20 @@ class MelMinimap extends ApplicationV2 {
     const row = build.nextRow++;
     const cellWidth = build.map.worldWidth / build.columns;
     const cellHeight = build.map.worldHeight / build.rows;
-    build.context.fillStyle = "rgb(0 0 0 / 94%)";
+    const exploredHiddenAlpha = getExploredHiddenMaskAlpha(this.#exploredAreaVisibility);
+    const exploredHiddenFill = `rgb(0 0 0 / ${exploredHiddenAlpha})`;
     for (let column = 0; column < build.columns; column += 1) {
       const point = {
         x: build.map.worldX + (column + 0.5) * cellWidth,
         y: build.map.worldY + (row + 0.5) * cellHeight
       };
-      if (!this.#isWorldPointVisible(point)) build.context.fillRect(column, row, 1, 1);
+      if (!this.#isWorldPointExplored(point)) {
+        build.context.fillStyle = "#000000";
+        build.context.fillRect(column, row, 1, 1);
+      } else if (!this.#isWorldPointCurrentlyVisible(point) && exploredHiddenAlpha > 0) {
+        build.context.fillStyle = exploredHiddenFill;
+        build.context.fillRect(column, row, 1, 1);
+      }
     }
 
     if (build.nextRow >= build.rows) {
@@ -1008,11 +1049,9 @@ class MelMinimap extends ApplicationV2 {
     return Boolean(fog?.fogExploration || fog?.exploration);
   }
 
-  #isWorldPointVisible(point) {
+  #isWorldPointExplored(point) {
     const fog = globalThis.canvas?.fog;
-    const visibility = globalThis.canvas?.visibility;
     let explored = true;
-    let visible = true;
 
     try {
       if (typeof fog?.isPointExplored === "function") explored = Boolean(fog.isPointExplored(point));
@@ -1020,13 +1059,24 @@ class MelMinimap extends ApplicationV2 {
       console.warn(`${MODULE_ID} could not query fog exploration`, error);
     }
 
+    return explored;
+  }
+
+  #isWorldPointCurrentlyVisible(point) {
+    const visibility = globalThis.canvas?.visibility;
+    let visible = true;
+
     try {
       if (typeof visibility?.testVisibility === "function") visible = Boolean(visibility.testVisibility(point));
     } catch (error) {
-      console.warn(`${MODULE_ID} could not query canvas visibility`, error);
+      console.warn(`${MODULE_ID} could not query current canvas visibility`, error);
     }
 
-    return explored && visible;
+    return visible;
+  }
+
+  #isWorldPointVisible(point) {
+    return this.#isWorldPointExplored(point) && this.#isWorldPointCurrentlyVisible(point);
   }
 
   #drawViewport(context, map, toMapX, toMapY, width, height) {
@@ -1176,6 +1226,11 @@ function handleWorldSettingChange(key, value) {
     return;
   }
 
+  if (key === SETTINGS.EXPLORED_AREA_VISIBILITY) {
+    for (const minimap of MelMinimap._instances) minimap.applyExploredAreaVisibilitySetting(value);
+    return;
+  }
+
   if (key === SETTINGS.SHOW_BACKGROUND || key === SETTINGS.SHOW_MAP_NOTES) {
     for (const minimap of MelMinimap._instances) minimap.redraw();
   }
@@ -1190,7 +1245,10 @@ async function migrateLegacyClientSettings() {
   const clientStorage = game.settings.storage.get("client");
   try {
     for (const [key, fallback] of Object.entries(DEFAULT_SETTINGS)) {
-      const value = readLegacyClientSetting(clientStorage, key, fallback);
+      const legacyValue = readLegacyClientSetting(clientStorage, key, fallback);
+      const value = key === SETTINGS.EXPLORED_AREA_VISIBILITY
+        ? normalizeExploredAreaVisibility(legacyValue, fallback)
+        : legacyValue;
       await game.settings.set(MODULE_ID, key, value);
     }
     await game.settings.set(MODULE_ID, SETTINGS_MIGRATION_SETTING, SETTINGS_MIGRATION_VERSION);
@@ -1248,6 +1306,21 @@ Hooks.once("init", () => {
     type: Boolean,
     default: DEFAULT_PERFORMANCE_OPTIMIZATION,
     onChange: value => handleWorldSettingChange(SETTINGS.PERFORMANCE_OPTIMIZATION, value)
+  });
+
+  game.settings.register(MODULE_ID, EXPLORED_AREA_VISIBILITY_SETTING, {
+    name: "MEL_MINIMAP.ExploredAreaVisibility",
+    hint: "MEL_MINIMAP.ExploredAreaVisibilityHint",
+    scope: "world",
+    config: true,
+    type: Number,
+    range: {
+      min: 0,
+      max: 100,
+      step: 1
+    },
+    default: DEFAULT_EXPLORED_AREA_VISIBILITY,
+    onChange: value => handleWorldSettingChange(SETTINGS.EXPLORED_AREA_VISIBILITY, value)
   });
 
   game.settings.register(MODULE_ID, SETTINGS_MIGRATION_SETTING, {

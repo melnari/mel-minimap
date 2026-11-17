@@ -8,6 +8,8 @@
   "MEL_MINIMAP.DynamicSizeHint": "Hiermee kan de minimap worden vergroot of verkleind met behoud van de kaartverhouding.",
   "MEL_MINIMAP.PerformanceOptimization": "Prestatie-optimalisatie voor grote kaarten",
   "MEL_MINIMAP.PerformanceOptimizationHint": "Vermindert de frequentie van kostbare Fog of War-updates om de prestaties op grote scènes te verbeteren.",
+  "MEL_MINIMAP.ExploredAreaVisibility": "Zichtbaarheid van verkende gebieden",
+  "MEL_MINIMAP.ExploredAreaVisibilityHint": "Bepaalt welk percentage van een verkend gebied zichtbaar blijft wanneer geen geallieerde Token het momenteel kan zien (0–100%).",
   "MEL_MINIMAP.NoScene": "Geen actieve scène",
   "MEL_MINIMAP.NoCanvas": "Canvas is nog niet gereed",
   "MEL_MINIMAP.Legend.Party": "Groep",

@@ -8,6 +8,8 @@
   "MEL_MINIMAP.DynamicSizeHint": "Permet de redimensionner la minicarte tout en conservant les proportions de la carte.",
   "MEL_MINIMAP.PerformanceOptimization": "Optimisation des performances pour les grandes cartes",
   "MEL_MINIMAP.PerformanceOptimizationHint": "Réduit la fréquence des mises à jour coûteuses du brouillard de guerre afin d’améliorer les performances des grandes scènes.",
+  "MEL_MINIMAP.ExploredAreaVisibility": "Visibilité des zones explorées",
+  "MEL_MINIMAP.ExploredAreaVisibilityHint": "Définit le pourcentage d’une zone explorée qui reste visible lorsqu’aucun token allié ne peut actuellement la voir (0–100 %).",
   "MEL_MINIMAP.NoScene": "Aucune scène active",
   "MEL_MINIMAP.NoCanvas": "Le canevas n’est pas encore prêt",
   "MEL_MINIMAP.Legend.Party": "Groupe",
